@@ -1,0 +1,2 @@
+# EncoreHub
+Artist Booking Platform
