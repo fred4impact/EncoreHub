@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Artist - {{ portfolio.artist.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Artist Booking Form Styles - Inspired by Pato */
+    .booking-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        padding: 3rem 0;
+        text-align: center;
+    }
+    
+    .booking-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: white;
+    }
+    
+    .booking-subtitle {
+        font-size: 1.125rem;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 1rem;
+    }
+    
+    .booking-description {
+        font-size: 1rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* Artist Info Section */
+    .artist-info {
+        background: white;
+        padding: 3rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .artist-card {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .artist-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #d4af37;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .artist-details h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+    }
+    
+    .artist-details p {
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+    
+    .artist-rate {
+        color: #d4af37;
+        font-weight: 600;
+        font-size: 1.125rem;
+    }
+    
+    /* Form Styles */
+    .booking-form-section {
+        padding: 4rem 0;
+        background: white;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .form-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #1a1a1a;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        color: #1a1a1a;
+        cursor: pointer;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+    
+    .btn-primary {
+        background: #d4af37;
+        color: #1a1a1a;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+        background: #c19b2e;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-secondary {
+        background: transparent;
+        color: #1a1a1a;
+        padding: 1rem 2rem;
+        border: 2px solid #1a1a1a;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+        background: #1a1a1a;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .booking-title {
+            font-size: 2rem;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+        }
+        
+        .artist-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="booking-header">
+    <div class="container">
+        <p class="booking-subtitle">Book Artist</p>
+        <h1 class="booking-title">Request Artist Booking</h1>
+        <p class="booking-description">Submit a booking request for this talented artist for your event.</p>
+    </div>
+</section>
+
+<!-- Artist Info Section -->
+<section class="artist-info">
+    <div class="container">
+        <div class="artist-card">
+            <div class="artist-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="artist-details">
+                <h3>{{ portfolio.artist.get_full_name }}</h3>
+                <p>{{ portfolio.headline|default:"Professional Artist" }}</p>
+                <p class="artist-rate">Base Rate: ${{ portfolio.base_rate }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Booking Form Section -->
+<section class="booking-form-section">
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title">Booking Request Details</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_event_name" class="form-label">Event Name</label>
+                    <input type="text" name="event_name" id="id_event_name" class="form-control" placeholder="e.g., Summer Wedding Reception" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_event_date" class="form-label">Event Date</label>
+                        <input type="date" name="event_date" id="id_event_date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_event_time" class="form-label">Event Time</label>
+                        <input type="time" name="event_time" id="id_event_time" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_event_type" class="form-label">Event Type</label>
+                        <select name="event_type" id="id_event_type" class="form-select" required>
+                            <option value="">Select event type...</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="corporate">Corporate Event</option>
+                            <option value="birthday">Birthday Party</option>
+                            <option value="anniversary">Anniversary</option>
+                            <option value="concert">Concert</option>
+                            <option value="festival">Festival</option>
+                            <option value="private">Private Event</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_venue_location" class="form-label">Venue/Location</label>
+                        <input type="text" name="venue_location" id="id_venue_location" class="form-control" placeholder="e.g., Grand Hotel Ballroom" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_duration" class="form-label">Performance Duration</label>
+                        <select name="duration" id="id_duration" class="form-select" required>
+                            <option value="">Select duration...</option>
+                            <option value="30min">30 minutes</option>
+                            <option value="1hour">1 hour</option>
+                            <option value="1.5hours">1.5 hours</option>
+                            <option value="2hours">2 hours</option>
+                            <option value="3hours">3 hours</option>
+                            <option value="4hours">4 hours</option>
+                            <option value="full_day">Full day</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_budget" class="form-label">Budget Range</label>
+                        <select name="budget" id="id_budget" class="form-select" required>
+                            <option value="">Select budget range...</option>
+                            <option value="under_500">Under $500</option>
+                            <option value="500_1000">$500 - $1,000</option>
+                            <option value="1000_2000">$1,000 - $2,000</option>
+                            <option value="2000_5000">$2,000 - $5,000</option>
+                            <option value="5000_10000">$5,000 - $10,000</option>
+                            <option value="over_10000">Over $10,000</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_audience_size" class="form-label">Expected Audience Size</label>
+                    <input type="number" name="audience_size" id="id_audience_size" class="form-control" placeholder="e.g., 150" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_description" class="form-label">Event Description</label>
+                    <textarea name="description" id="id_description" class="form-control" rows="4" placeholder="Describe your event, requirements, and any special requests..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_special_requirements" class="form-label">Special Requirements</label>
+                    <textarea name="special_requirements" id="id_special_requirements" class="form-control" rows="3" placeholder="Any specific requirements, equipment needs, or special requests..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Booking Request
+                    </button>
+                    <a href="{% url 'artists:detail' portfolio.pk %}" class="btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Artist Profile
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

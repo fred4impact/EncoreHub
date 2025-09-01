@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Artists - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="fade-in-up">Discover Amazing Artists</h1>
+                <p class="lead slide-in-left">Find the perfect talent for your next event from our curated selection of world-class artists.</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="pulse">
+                    <i class="fas fa-microphone" style="font-size: 6rem; color: rgba(255,255,255,0.3);"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+                    <div class="text-center mb-5">
+            <h2 class="text-primary">Featured Artists</h2>
+            <p class="lead">Browse our collection of talented performers</p>
+        </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Sample Artist Cards -->
+        <div class="col-md-4 mb-4">
+            <div class="artist-card">
+                <div class="card-img-top d-flex align-items-center justify-content-center">
+                    <i class="fas fa-user-circle fa-4x text-muted"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sarah Johnson</h5>
+                    <p class="card-text text-muted">Jazz Vocalist</p>
+                    <p class="card-text"><small class="text-muted">New York, NY</small></p>
+                    <a href="#" class="btn btn-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="artist-card">
+                <div class="card-img-top d-flex align-items-center justify-content-center">
+                    <i class="fas fa-user-circle fa-4x text-muted"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Mike Chen</h5>
+                    <p class="card-text text-muted">Rock Band</p>
+                    <p class="card-text"><small class="text-muted">Los Angeles, CA</small></p>
+                    <a href="#" class="btn btn-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="artist-card">
+                <div class="card-img-top d-flex align-items-center justify-content-center">
+                    <i class="fas fa-user-circle fa-4x text-muted"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Emma Davis</h5>
+                    <p class="card-text text-muted">Pop Singer</p>
+                    <p class="card-text"><small class="text-muted">Nashville, TN</small></p>
+                    <a href="#" class="btn btn-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

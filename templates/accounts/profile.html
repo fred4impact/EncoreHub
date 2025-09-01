@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.get_full_name|default:user.email }} - Profile - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Profile Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="avatar avatar-xl rounded-circle bg-primary d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user fa-2x text-white"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2 class="mb-1">{{ user.get_full_name|default:user.email }}</h2>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-tag me-2"></i>{{ user.get_user_type_display }}
+                                {% if user.artist_profile %}
+                                    <span class="ms-3"><i class="fas fa-map-marker-alt me-1"></i>{{ user.artist_profile.city }}, {{ user.artist_profile.state }}</span>
+                                {% elif user.venue_profile %}
+                                    <span class="ms-3"><i class="fas fa-building me-1"></i>{{ user.venue_profile.venue_name }}</span>
+                                {% elif user.manager_profile %}
+                                    <span class="ms-3"><i class="fas fa-briefcase me-1"></i>{{ user.manager_profile.company_name }}</span>
+                                {% endif %}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-calendar me-2"></i>Joined {{ user.date_joined|date:"F Y" }}
+                            </p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit me-2"></i>Edit Profile
+                                </a>
+                                <button type="button" class="btn btn-outline-secondary">
+                                    <i class="fas fa-share me-2"></i>Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Profile Information -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>Profile Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user.user_type == 'artist' and user.artist_profile %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Stage Name</label>
+                                    <p class="mb-0">{{ user.artist_profile.stage_name|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Genre</label>
+                                    <p class="mb-0">{{ user.artist_profile.genre|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Bio</label>
+                            <p class="mb-0">{{ user.artist_profile.bio|default:"No bio available" }}</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Experience</label>
+                                    <p class="mb-0">{{ user.artist_profile.experience_years }} years</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Hourly Rate</label>
+                                    <p class="mb-0">${{ user.artist_profile.hourly_rate|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif user.user_type == 'venue' and user.venue_profile %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Venue Name</label>
+                                    <p class="mb-0">{{ user.venue_profile.venue_name }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Venue Type</label>
+                                    <p class="mb-0">{{ user.venue_profile.venue_type|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Description</label>
+                            <p class="mb-0">{{ user.venue_profile.description|default:"No description available" }}</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Capacity</label>
+                                    <p class="mb-0">{{ user.venue_profile.capacity|default:"Not set" }} people</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Location</label>
+                                    <p class="mb-0">{{ user.venue_profile.city }}, {{ user.venue_profile.state }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif user.user_type == 'manager' and user.manager_profile %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Company</label>
+                                    <p class="mb-0">{{ user.manager_profile.company_name|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Specialization</label>
+                                    <p class="mb-0">{{ user.manager_profile.specialization|default:"Not set" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Bio</label>
+                            <p class="mb-0">{{ user.manager_profile.bio|default:"No bio available" }}</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Experience</label>
+                                    <p class="mb-0">{{ user.manager_profile.experience_years }} years</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Commission Rate</label>
+                                    <p class="mb-0">{{ user.manager_profile.commission_rate }}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+                            <h5>Complete Your Profile</h5>
+                            <p class="text-muted">Set up your profile to get started with EncoreHub</p>
+                            <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Complete Profile
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-activity me-2"></i>Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        <div class="activity-item d-flex align-items-start mb-3">
+                            <div class="activity-icon bg-primary rounded-circle p-2 me-3">
+                                <i class="fas fa-user-plus text-white"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Profile Created</h6>
+                                <p class="text-muted mb-0">Welcome to EncoreHub! Your profile was created successfully.</p>
+                                <small class="text-muted">{{ user.date_joined|timesince }} ago</small>
+                            </div>
+                        </div>
+                        
+                        {% if user.user_type == 'artist' %}
+                        <div class="activity-item d-flex align-items-start mb-3">
+                            <div class="activity-icon bg-success rounded-circle p-2 me-3">
+                                <i class="fas fa-music text-white"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Ready for Bookings</h6>
+                                <p class="text-muted mb-0">Your artist profile is now visible to venues and event organizers.</p>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                        {% elif user.user_type == 'venue' %}
+                        <div class="activity-item d-flex align-items-start mb-3">
+                            <div class="activity-icon bg-info rounded-circle p-2 me-3">
+                                <i class="fas fa-calendar text-white"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Ready to Host Events</h6>
+                                <p class="text-muted mb-0">Your venue profile is now visible to artists and booking agents.</p>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                        {% elif user.user_type == 'manager' %}
+                        <div class="activity-item d-flex align-items-start mb-3">
+                            <div class="activity-icon bg-warning rounded-circle p-2 me-3">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h6 class="mb-1">Ready to Manage Artists</h6>
+                                <p class="text-muted mb-0">Your manager profile is now visible to artists and venues.</p>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Quick Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user.user_type == 'artist' %}
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-primary mb-1">0</h3>
+                                    <small class="text-muted">Upcoming Gigs</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-success mb-1">0</h3>
+                                    <small class="text-muted">Total Earnings</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-info mb-1">0</h3>
+                                    <small class="text-muted">Profile Views</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-warning mb-1">0</h3>
+                                    <small class="text-muted">Pending Offers</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif user.user_type == 'venue' %}
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-primary mb-1">0</h3>
+                                    <small class="text-muted">Booked Events</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-success mb-1">0</h3>
+                                    <small class="text-muted">Revenue</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-info mb-1">0</h3>
+                                    <small class="text-muted">Available Dates</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-warning mb-1">0</h3>
+                                    <small class="text-muted">Pending Requests</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif user.user_type == 'manager' %}
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-primary mb-1">0</h3>
+                                    <small class="text-muted">Managed Artists</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-success mb-1">0</h3>
+                                    <small class="text-muted">Total Bookings</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-info mb-1">0</h3>
+                                    <small class="text-muted">Commission</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="stat-item">
+                                    <h3 class="text-warning mb-1">0</h3>
+                                    <small class="text-muted">Pending Contracts</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user.user_type == 'artist' %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'artists:my_portfolio' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-microphone me-2"></i>Manage Portfolio
+                            </a>
+                            <a href="{% url 'bookings:event_list' %}" class="btn btn-outline-success">
+                                <i class="fas fa-search me-2"></i>Browse Events
+                            </a>
+                            <a href="{% url 'bookings:my_requests' %}" class="btn btn-outline-info">
+                                <i class="fas fa-handshake me-2"></i>My Requests
+                            </a>
+                        </div>
+                    {% elif user.user_type == 'venue' %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'bookings:create_event' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-plus me-2"></i>Create Event
+                            </a>
+                            <a href="{% url 'artists:list' %}" class="btn btn-outline-success">
+                                <i class="fas fa-search me-2"></i>Browse Artists
+                            </a>
+                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-info">
+                                <i class="fas fa-calendar me-2"></i>My Bookings
+                            </a>
+                        </div>
+                    {% elif user.user_type == 'manager' %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'artists:list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-users me-2"></i>Browse Artists
+                            </a>
+                            <a href="{% url 'bookings:event_list' %}" class="btn btn-outline-success">
+                                <i class="fas fa-calendar me-2"></i>Browse Events
+                            </a>
+                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-info">
+                                <i class="fas fa-handshake me-2"></i>My Bookings
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.avatar {
+    width: 80px;
+    height: 80px;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-item h3 {
+    font-weight: 700;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

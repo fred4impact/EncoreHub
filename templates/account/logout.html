@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Logout - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg mt-5">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="avatar avatar-xl rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3">
+                            <i class="fas fa-sign-out-alt fa-2x text-white"></i>
+                        </div>
+                        <h2 class="mb-2">Sign Out</h2>
+                        <p class="text-muted">Are you sure you want to sign out?</p>
+                    </div>
+
+                    <!-- Logout Form -->
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        
+                        {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-sign-out-alt me-2"></i>Yes, Sign Out
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel & Go Back
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Additional Info -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            You'll need to sign in again to access your account.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="text-center mt-4">
+                <p class="text-muted mb-2">Need help?</p>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-question-circle me-1"></i>Help
+                    </a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-envelope me-1"></i>Contact
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.avatar {
+    width: 80px;
+    height: 80px;
+}
+
+.card {
+    border-radius: 16px;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-lg {
+    padding: 12px 24px;
+}
+
+.btn-group .btn {
+    border-radius: 6px;
+}
+
+.card-body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.avatar {
+    background: linear-gradient(135deg, #d4af37 0%, #c19b2e 100%);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+</style>
+{% endblock %}

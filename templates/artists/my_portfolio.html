@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Portfolio - {{ portfolio.artist.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .portfolio-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .portfolio-stats {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .media-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .media-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .media-preview {
+        height: 200px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .media-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+    }
+    
+    .media-preview .media-icon {
+        font-size: 3rem;
+        color: #6c757d;
+    }
+    
+    .performance-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .availability-calendar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+    
+    .social-link:hover {
+        transform: scale(1.1);
+        color: white;
+    }
+    
+    .instagram { background: #e4405f; }
+    .facebook { background: #3b5998; }
+    .youtube { background: #ff0000; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Portfolio Header -->
+<div class="portfolio-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-microphone me-3"></i>
+                    My Portfolio
+                </h1>
+                <p class="lead mb-0">
+                    Showcase your talent and connect with opportunities
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'artists:add_media' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add Media
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Portfolio Stats -->
+    <div class="portfolio-stats">
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <h3 class="text-primary">{{ media.count }}</h3>
+                <p class="text-muted">Media Items</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <h3 class="text-success">{{ performances.count }}</h3>
+                <p class="text-muted">Past Performances</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <h3 class="text-info">{{ availability.count }}</h3>
+                <p class="text-muted">Available Dates</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <h3 class="text-warning">${{ portfolio.base_rate }}</h3>
+                <p class="text-muted">Base Rate</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>Portfolio Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.headline.id_for_label }}" class="form-label">Headline</label>
+                                {{ form.headline }}
+                                {% if form.headline.errors %}
+                                    <div class="text-danger">{{ form.headline.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.base_rate.id_for_label }}" class="form-label">Base Rate ($)</label>
+                                {{ form.base_rate }}
+                                {% if form.base_rate.errors %}
+                                    <div class="text-danger">{{ form.base_rate.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger">{{ form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.genres.id_for_label }}" class="form-label">Genres</label>
+                                {{ form.genres }}
+                                {% if form.genres.errors %}
+                                    <div class="text-danger">{{ form.genres.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.instruments.id_for_label }}" class="form-label">Instruments</label>
+                                {{ form.instruments }}
+                                {% if form.instruments.errors %}
+                                    <div class="text-danger">{{ form.instruments.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.performance_types.id_for_label }}" class="form-label">Performance Types</label>
+                                {{ form.performance_types }}
+                                {% if form.performance_types.errors %}
+                                    <div class="text-danger">{{ form.performance_types.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.set_lengths.id_for_label }}" class="form-label">Set Lengths</label>
+                                {{ form.set_lengths }}
+                                {% if form.set_lengths.errors %}
+                                    <div class="text-danger">{{ form.set_lengths.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.pricing_notes.id_for_label }}" class="form-label">Pricing Notes</label>
+                            {{ form.pricing_notes }}
+                            {% if form.pricing_notes.errors %}
+                                <div class="text-danger">{{ form.pricing_notes.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.is_available }}
+                                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                        Available for bookings
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.availability_notes.id_for_label }}" class="form-label">Availability Notes</label>
+                            {{ form.availability_notes }}
+                            {% if form.availability_notes.errors %}
+                                <div class="text-danger">{{ form.availability_notes.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.social_links.id_for_label }}" class="form-label">Social Media Links (JSON format)</label>
+                            {{ form.social_links }}
+                            {% if form.social_links.errors %}
+                                <div class="text-danger">{{ form.social_links.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Format: {"instagram": "https://instagram.com/...", "youtube": "https://youtube.com/..."}
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Portfolio
+                            </button>
+                            <a href="{% url 'artists:add_performance' %}" class="btn btn-outline-success">
+                                <i class="fas fa-plus me-2"></i>Add Performance
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Social Media Links -->
+            {% if portfolio.social_links %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-share-alt me-2"></i>Social Media
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="social-links">
+                        {% if portfolio.social_links.instagram %}
+                            <a href="{{ portfolio.social_links.instagram }}" class="social-link instagram" target="_blank">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        {% endif %}
+                        {% if portfolio.social_links.facebook %}
+                            <a href="{{ portfolio.social_links.facebook }}" class="social-link facebook" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        {% endif %}
+                        {% if portfolio.social_links.youtube %}
+                            <a href="{{ portfolio.social_links.youtube }}" class="social-link youtube" target="_blank">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-tools me-2"></i>Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'artists:add_media' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Add Media
+                        </a>
+                        <a href="{% url 'artists:add_performance' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-calendar-plus me-2"></i>Add Performance
+                        </a>
+                        <a href="{% url 'artists:manage_availability' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-clock me-2"></i>Manage Availability
+                        </a>
+                        <a href="{% url 'artists:list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-eye me-2"></i>View Public Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Media -->
+    {% if media %}
+    <div class="mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>
+                <i class="fas fa-images me-2"></i>Portfolio Media
+            </h3>
+            <a href="{% url 'artists:add_media' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Media
+            </a>
+        </div>
+        
+        <div class="media-grid">
+            {% for item in media %}
+            <div class="media-card">
+                <div class="media-preview">
+                    {% if item.media_type == 'photo' %}
+                        <img src="{{ item.file.url }}" alt="{{ item.title }}">
+                    {% elif item.media_type == 'video' %}
+                        <i class="fas fa-video media-icon"></i>
+                    {% elif item.media_type == 'audio' %}
+                        <i class="fas fa-music media-icon"></i>
+                    {% else %}
+                        <i class="fas fa-file media-icon"></i>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">{{ item.title }}</h6>
+                    <p class="card-text text-muted">{{ item.description|truncatewords:10 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ item.media_type|title }}</small>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'artists:edit_media' item.pk %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'artists:delete_media' item.pk %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Past Performances -->
+    {% if performances %}
+    <div class="mt-5">
+        <h3 class="mb-4">
+            <i class="fas fa-calendar-alt me-2"></i>Past Performances
+        </h3>
+        
+        {% for performance in performances %}
+        <div class="performance-card">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5 class="mb-1">{{ performance.title }}</h5>
+                    <p class="text-muted mb-2">{{ performance.venue_name }} • {{ performance.event_type }}</p>
+                    <p class="mb-0">
+                        <i class="fas fa-calendar me-2"></i>{{ performance.event_date|date:"F j, Y" }}
+                        <i class="fas fa-clock ms-3 me-2"></i>{{ performance.duration }}
+                        {% if performance.audience_size %}
+                            <i class="fas fa-users ms-3 me-2"></i>{{ performance.audience_size }} people
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'artists:edit_performance' performance.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <a href="{% url 'artists:delete_performance' performance.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Availability Calendar -->
+    {% if availability %}
+    <div class="mt-5">
+        <h3 class="mb-4">
+            <i class="fas fa-clock me-2"></i>Availability
+        </h3>
+        
+        <div class="availability-calendar">
+            <div class="row">
+                {% for slot in availability %}
+                <div class="col-md-6 mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ slot.date|date:"F j, Y" }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                {% if slot.morning_available %}Morning{% endif %}
+                                {% if slot.afternoon_available %}{% if slot.morning_available %} • {% endif %}Afternoon{% endif %}
+                                {% if slot.evening_available %}{% if slot.morning_available or slot.afternoon_available %} • {% endif %}Evening{% endif %}
+                                {% if not slot.morning_available and not slot.afternoon_available and not slot.evening_available %}Not Available{% endif %}
+                            </small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'artists:edit_availability' slot.pk %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'artists:delete_availability' slot.pk %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

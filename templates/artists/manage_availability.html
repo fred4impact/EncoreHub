@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Availability - {{ user.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Availability Management Styles - Inspired by Pato */
+    .availability-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        padding: 3rem 0;
+        text-align: center;
+    }
+    
+    .availability-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: white;
+    }
+    
+    .availability-subtitle {
+        font-size: 1.125rem;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 1rem;
+    }
+    
+    .availability-description {
+        font-size: 1rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* Form Styles */
+    .availability-form-section {
+        padding: 4rem 0;
+        background: white;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .form-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #1a1a1a;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        color: #1a1a1a;
+        cursor: pointer;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: #d4af37;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .checkbox-item:hover {
+        border-color: #d4af37;
+        background: rgba(212, 175, 55, 0.05);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #d4af37;
+    }
+    
+    .checkbox-label {
+        font-weight: 500;
+        color: #1a1a1a;
+        cursor: pointer;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+    
+    .btn-primary {
+        background: #d4af37;
+        color: #1a1a1a;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+        background: #c19b2e;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-secondary {
+        background: transparent;
+        color: #1a1a1a;
+        padding: 1rem 2rem;
+        border: 2px solid #1a1a1a;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-secondary:hover {
+        background: #1a1a1a;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Current Availability Section */
+    .current-availability {
+        padding: 4rem 0;
+        background: #f8f9fa;
+    }
+    
+    .availability-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .availability-card {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .availability-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .availability-date {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 1rem;
+    }
+    
+    .availability-status {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+    }
+    
+    .status-available {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+    
+    .status-unavailable {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+    
+    .status-maybe {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+        border: 1px solid #ffc107;
+    }
+    
+    .status-booked {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+        border: 1px solid #6c757d;
+    }
+    
+    .time-slots {
+        margin-top: 1rem;
+    }
+    
+    .time-slot {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .time-slot.available {
+        color: #28a745;
+    }
+    
+    .time-slot.unavailable {
+        color: #dc3545;
+    }
+    
+    .time-slot i {
+        font-size: 0.75rem;
+    }
+    
+    .availability-notes {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-edit {
+        background: #d4af37;
+        color: #1a1a1a;
+    }
+    
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .availability-title {
+            font-size: 2rem;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+        }
+        
+        .checkbox-group {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .availability-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="availability-header">
+    <div class="container">
+        <p class="availability-subtitle">Manage Your Availability</p>
+        <h1 class="availability-title">Set Your Schedule</h1>
+        <p class="availability-description">Manage your availability to help venues and clients find the perfect time to book you for their events.</p>
+    </div>
+</section>
+
+<!-- Add Availability Form -->
+<section class="availability-form-section">
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title">Add New Availability</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_date" class="form-label">Date</label>
+                    <input type="date" name="date" id="id_date" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_availability_status" class="form-label">Availability Status</label>
+                    <select name="availability_status" id="id_availability_status" class="form-select" required>
+                        <option value="">Select status...</option>
+                        <option value="available">Available</option>
+                        <option value="unavailable">Unavailable</option>
+                        <option value="maybe">Maybe Available</option>
+                        <option value="booked">Booked</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Time Slots</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="morning_available" id="id_morning_available" checked>
+                            <label for="id_morning_available" class="checkbox-label">Morning (6 AM - 12 PM)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="afternoon_available" id="id_afternoon_available" checked>
+                            <label for="id_afternoon_available" class="checkbox-label">Afternoon (12 PM - 6 PM)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="evening_available" id="id_evening_available" checked>
+                            <label for="id_evening_available" class="checkbox-label">Evening (6 PM - 12 AM)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_notes" class="form-label">Notes</label>
+                    <textarea name="notes" id="id_notes" class="form-control" rows="4" placeholder="Any additional notes about your availability..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Availability
+                    </button>
+                    <a href="{% url 'artists:my_portfolio' %}" class="btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Portfolio
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Current Availability -->
+{% if availability %}
+<section class="current-availability">
+    <div class="container">
+        <h2 class="form-title">Current Availability</h2>
+        
+        <div class="availability-grid">
+            {% for slot in availability %}
+            <div class="availability-card">
+                <div class="availability-date">{{ slot.date|date:"F j, Y" }}</div>
+                
+                <div class="availability-status status-{{ slot.availability_status }}">
+                    {{ slot.availability_status|title }}
+                </div>
+                
+                <div class="time-slots">
+                    <div class="time-slot {% if slot.morning_available %}available{% else %}unavailable{% endif %}">
+                        <i class="fas fa-sun"></i>
+                        Morning: {% if slot.morning_available %}Available{% else %}Unavailable{% endif %}
+                    </div>
+                    <div class="time-slot {% if slot.afternoon_available %}available{% else %}unavailable{% endif %}">
+                        <i class="fas fa-cloud-sun"></i>
+                        Afternoon: {% if slot.afternoon_available %}Available{% else %}Unavailable{% endif %}
+                    </div>
+                    <div class="time-slot {% if slot.evening_available %}available{% else %}unavailable{% endif %}">
+                        <i class="fas fa-moon"></i>
+                        Evening: {% if slot.evening_available %}Available{% else %}Unavailable{% endif %}
+                    </div>
+                </div>
+                
+                {% if slot.notes %}
+                <div class="availability-notes">
+                    <strong>Notes:</strong> {{ slot.notes }}
+                </div>
+                {% endif %}
+                
+                <div class="card-actions">
+                    <a href="{% url 'artists:edit_availability' slot.pk %}" class="btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                    <a href="{% url 'artists:delete_availability' slot.pk %}" class="btn-delete btn-sm">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

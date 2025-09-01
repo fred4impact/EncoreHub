@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Artists - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-music text-primary me-2"></i>Artists
+                    </h1>
+                    <p class="text-muted mb-0">Discover talented performers</p>
+                </div>
+                {% if user.user_type == 'artist' %}
+                <div>
+                    <a href="{% url 'artists:my_portfolio' %}" class="btn btn-primary">
+                        <i class="fas fa-user me-2"></i>My Portfolio
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Search</label>
+                            <input type="text" name="search" id="search" class="form-control" value="{{ search_query }}" placeholder="Search by name, genre, or location...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="genre" class="form-label">Genre</label>
+                            <select name="genre" id="genre" class="form-select">
+                                <option value="">All Genres</option>
+                                {% for genre in genres %}
+                                <option value="{{ genre }}" {% if request.GET.genre == genre %}selected{% endif %}>{{ genre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" name="city" id="city" class="form-control" value="{{ request.GET.city }}" placeholder="Enter city">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Artists Grid -->
+    <div class="row">
+        {% for artist in page_obj %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="fas fa-user text-primary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">{{ artist.artist.get_full_name }}</h5>
+                            {% if artist.headline %}
+                            <p class="text-muted mb-0">{{ artist.headline }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if artist.genres %}
+                    <div class="mb-3">
+                        <small class="text-muted">Genres:</small>
+                        <div>
+                            {% for genre in artist.genres|slice:":3" %}
+                            <span class="badge bg-secondary me-1">{{ genre }}</span>
+                            {% endfor %}
+                            {% if artist.genres|length > 3 %}
+                            <span class="badge bg-secondary">+{{ artist.genres|length|add:"-3" }} more</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Base Rate</small>
+                            <div><strong>${{ artist.base_rate }}</strong></div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Location</small>
+                            <div>{{ artist.artist.artist_profile.city|default:"Not specified" }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if artist.bio %}
+                    <p class="card-text text-muted">{{ artist.bio|truncatewords:15 }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            {% if artist.is_available %}
+                            <span class="text-success"><i class="fas fa-circle me-1"></i>Available</span>
+                            {% else %}
+                            <span class="text-muted"><i class="fas fa-circle me-1"></i>Unavailable</span>
+                            {% endif %}
+                        </small>
+                        <a href="{% url 'artists:detail' artist.pk %}" class="btn btn-outline-primary btn-sm">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                <h4>No artists found</h4>
+                <p class="text-muted">Try adjusting your search criteria or check back later for new artists.</p>
+                {% if user.user_type == 'artist' %}
+                <a href="{% url 'artists:my_portfolio' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Your Portfolio
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Artists pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

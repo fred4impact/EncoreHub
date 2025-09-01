@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Django Web Application
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=encorehub.settings.development
+      - DATABASE_URL=postgresql://encorehub:encorehub@db:5432/encorehub
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    networks:
+      - encorehub_network
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=encorehub
+      - POSTGRES_USER=encorehub
+      - POSTGRES_PASSWORD=encorehub
+    ports:
+      - "5432:5432"
+    networks:
+      - encorehub_network
+
+  # Redis for Caching and WebSockets
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - encorehub_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume:
+
+networks:
+  encorehub_network:
+    driver: bridge 

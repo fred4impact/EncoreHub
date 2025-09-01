@@ -1,0 +1,488 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        {% if user_type == 'artist' %}
+                            <i class="fas fa-music text-primary me-2"></i>Artist Dashboard
+                        {% elif user_type == 'venue' %}
+                            <i class="fas fa-building text-primary me-2"></i>Venue Dashboard
+                        {% elif user_type == 'manager' %}
+                            <i class="fas fa-users text-primary me-2"></i>Manager Dashboard
+                        {% else %}
+                            <i class="fas fa-tachometer-alt text-primary me-2"></i>Dashboard
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if user_type == 'artist' %}
+                        <a href="{% url 'artists:my_portfolio' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Manage Portfolio
+                        </a>
+                    {% elif user_type == 'venue' %}
+                        <a href="{% url 'bookings:create_event' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Event
+                        </a>
+                    {% elif user_type == 'manager' %}
+                        <a href="{% url 'artists:list' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Browse Artists
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Artist Dashboard -->
+    {% if user_type == 'artist' %}
+        <!-- Stats Cards for Artists -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Upcoming Gigs</h6>
+                                <h3 class="mb-0">12</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>3 new this week
+                                </small>
+                            </div>
+                            <div class="bg-primary-light rounded p-3">
+                                <i class="fas fa-calendar text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Total Earnings</h6>
+                                <h3 class="mb-0">$8,450</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>15.2%
+                                </small>
+                            </div>
+                            <div class="bg-success-light rounded p-3">
+                                <i class="fas fa-dollar-sign text-success fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Profile Views</h6>
+                                <h3 class="mb-0">1,234</h3>
+                                <small class="text-info">
+                                    <i class="fas fa-arrow-up me-1"></i>8.5%
+                                </small>
+                            </div>
+                            <div class="bg-info-light rounded p-3">
+                                <i class="fas fa-eye text-info fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Pending Offers</h6>
+                                <h3 class="mb-0">5</h3>
+                                <small class="text-warning">
+                                    <i class="fas fa-clock me-1"></i>Need response
+                                </small>
+                            </div>
+                            <div class="bg-warning-light rounded p-3">
+                                <i class="fas fa-clock text-warning fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Performances -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Upcoming Performances</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Venue</th>
+                                        <th>Event</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Dec 15, 2024</strong><br><small class="text-muted">8:00 PM</small></td>
+                                        <td>Blue Note Jazz Club</td>
+                                        <td>Jazz Night</td>
+                                        <td><strong>$500</strong></td>
+                                        <td><span class="badge badge-success">Confirmed</span></td>
+                                        <td>
+                                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Dec 20, 2024</strong><br><small class="text-muted">9:00 PM</small></td>
+                                        <td>Rock Arena</td>
+                                        <td>Rock Festival</td>
+                                        <td><strong>$1,200</strong></td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                        <td>
+                                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Venue Dashboard -->
+    {% elif user_type == 'venue' %}
+        <!-- Stats Cards for Venues -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Booked Events</h6>
+                                <h3 class="mb-0">28</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>4 this month
+                                </small>
+                            </div>
+                            <div class="bg-primary-light rounded p-3">
+                                <i class="fas fa-calendar-check text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Revenue</h6>
+                                <h3 class="mb-0">$45,200</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>12.8%
+                                </small>
+                            </div>
+                            <div class="bg-success-light rounded p-3">
+                                <i class="fas fa-dollar-sign text-success fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Available Dates</h6>
+                                <h3 class="mb-0">15</h3>
+                                <small class="text-info">
+                                    <i class="fas fa-calendar me-1"></i>Next 30 days
+                                </small>
+                            </div>
+                            <div class="bg-info-light rounded p-3">
+                                <i class="fas fa-calendar-day text-info fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Pending Requests</h6>
+                                <h3 class="mb-0">8</h3>
+                                <small class="text-warning">
+                                    <i class="fas fa-clock me-1"></i>Need review
+                                </small>
+                            </div>
+                            <div class="bg-warning-light rounded p-3">
+                                <i class="fas fa-clock text-warning fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Upcoming Events</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Artist</th>
+                                        <th>Event Type</th>
+                                        <th>Capacity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Dec 15, 2024</strong><br><small class="text-muted">8:00 PM</small></td>
+                                        <td>Sarah Johnson Jazz Quartet</td>
+                                        <td>Jazz Night</td>
+                                        <td>150/200</td>
+                                        <td><span class="badge badge-success">Confirmed</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Dec 20, 2024</strong><br><small class="text-muted">9:00 PM</small></td>
+                                        <td>Mike Chen Band</td>
+                                        <td>Rock Concert</td>
+                                        <td>300/500</td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                        <td>
+                                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Manager Dashboard -->
+    {% elif user_type == 'manager' %}
+        <!-- Stats Cards for Managers -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Managed Artists</h6>
+                                <h3 class="mb-0">12</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>2 new this month
+                                </small>
+                            </div>
+                            <div class="bg-primary-light rounded p-3">
+                                <i class="fas fa-users text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Total Bookings</h6>
+                                <h3 class="mb-0">156</h3>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>18.5%
+                                </small>
+                            </div>
+                            <div class="bg-success-light rounded p-3">
+                                <i class="fas fa-calendar-check text-success fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Commission</h6>
+                                <h3 class="mb-0">$12,450</h3>
+                                <small class="text-info">
+                                    <i class="fas fa-arrow-up me-1"></i>22.3%
+                                </small>
+                            </div>
+                            <div class="bg-info-light rounded p-3">
+                                <i class="fas fa-dollar-sign text-info fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted mb-1">Pending Contracts</h6>
+                                <h3 class="mb-0">7</h3>
+                                <small class="text-warning">
+                                    <i class="fas fa-clock me-1"></i>Need review
+                                </small>
+                            </div>
+                            <div class="bg-warning-light rounded p-3">
+                                <i class="fas fa-file-contract text-warning fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artist Management -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Artist Management</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Artist</th>
+                                        <th>Genre</th>
+                                        <th>Next Gig</th>
+                                        <th>Earnings</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded-circle p-2 me-3">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold">Sarah Johnson</div>
+                                                    <small class="text-muted">Jazz Vocalist</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Jazz</td>
+                                        <td>Dec 15, 2024</td>
+                                        <td><strong>$2,500</strong></td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">Manage</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded-circle p-2 me-3">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold">Mike Chen</div>
+                                                    <small class="text-muted">Rock Band</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Rock</td>
+                                        <td>Dec 20, 2024</td>
+                                        <td><strong>$5,000</strong></td>
+                                        <td><span class="badge badge-warning">Contract Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">Manage</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Default Dashboard (if no user type) -->
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-cog fa-4x text-muted mb-3"></i>
+                        <h4>Welcome to EncoreHub!</h4>
+                        <p class="text-muted">Please complete your profile setup to access your personalized dashboard.</p>
+                        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Complete Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.bg-primary-light { background-color: #e7f3ff; }
+.bg-success-light { background-color: #d4edda; }
+.bg-warning-light { background-color: #fff3cd; }
+.bg-info-light { background-color: #d1ecf1; }
+</style>
+{% endblock %} 

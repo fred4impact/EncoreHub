@@ -1,0 +1,766 @@
+{% extends 'base.html' %}
+
+{% block title %}EncoreHub - Connect Artists with Opportunities{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Override container for hero banner */
+    .hero-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Modern Hero Banner Styles - Inspired by Pato */
+    .hero-banner {
+        position: relative;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        font-family: 'Poppins', sans-serif;
+        margin-top: 0;
+        padding-top: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+    }
+    
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
+        opacity: 0.3;
+        z-index: 1;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 4rem;
+    }
+    
+    .hero-subtitle {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 400;
+        color: white;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 4.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        line-height: 1.1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+        color: #d4af37;
+    }
+    
+    .hero-description {
+        font-size: 1.25rem;
+        font-weight: 300;
+        margin-bottom: 3rem;
+        opacity: 0.9;
+        line-height: 1.6;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+    
+    .hero-btn {
+        padding: 1.25rem 2.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 200px;
+        justify-content: center;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-btn-primary {
+        background: #d4af37;
+        color: #1a1a1a;
+        border: 2px solid #d4af37;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #1a1a1a;
+        transition: left 0.3s ease;
+        z-index: -1;
+    }
+    
+    .hero-btn-primary:hover {
+        background: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .hero-btn-primary:hover::before {
+        left: 0;
+    }
+    
+    .hero-btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-btn-secondary:hover {
+        background: white;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+    }
+    
+    /* About Section - Inspired by Pato */
+    .about-section {
+        padding: 8rem 0;
+        background: white;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .about-content {
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+    }
+    
+    .about-image {
+        flex: 1;
+        position: relative;
+    }
+    
+    .about-image img {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    
+    .about-image::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        right: 20px;
+        bottom: 20px;
+        border: 2px solid #d4af37;
+        border-radius: 10px;
+        z-index: -1;
+    }
+    
+    .about-text {
+        flex: 1;
+    }
+    
+    .section-subtitle {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.125rem;
+        color: #d4af37;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 1rem;
+        font-weight: 400;
+    }
+    
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 2rem;
+        line-height: 1.2;
+    }
+    
+    .section-description {
+        font-size: 1.125rem;
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+    
+    .about-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #d4af37;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Services Section */
+    .services-section {
+        padding: 8rem 0;
+        background: #f8f9fa;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 3rem;
+        margin-top: 4rem;
+    }
+    
+    .service-card {
+        background: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #d4af37;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .service-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    
+    .service-icon {
+        width: 80px;
+        height: 80px;
+        background: #d4af37;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2rem;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .service-card:hover .service-icon {
+        transform: scale(1.1);
+    }
+    
+    .service-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 1rem;
+    }
+    
+    .service-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .service-btn {
+        background: transparent;
+        color: #d4af37;
+        border: 2px solid #d4af37;
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .service-btn:hover {
+        background: #d4af37;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* Artists Section */
+    .artists-section {
+        padding: 8rem 0;
+        background: white;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 3rem;
+        margin-top: 4rem;
+    }
+    
+    .artist-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .artist-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    
+    .artist-image {
+        height: 300px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .artist-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80') center/cover;
+        opacity: 0.4;
+    }
+    
+    .artist-image i {
+        font-size: 4rem;
+        color: rgba(255,255,255,0.8);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .artist-info {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .artist-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+    }
+    
+    .artist-genre {
+        color: #d4af37;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .artist-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .artist-btn {
+        background: #d4af37;
+        color: #1a1a1a;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .artist-btn:hover {
+        background: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        padding: 6rem 0;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .cta-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: white;
+    }
+    
+    .cta-description {
+        font-size: 1.25rem;
+        margin-bottom: 3rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        color: white;
+    }
+    
+    .cta-btn {
+        background: #d4af37;
+        color: #1a1a1a;
+        padding: 1.25rem 2.5rem;
+        border-radius: 0;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .cta-btn:hover {
+        background: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .hero-description {
+            font-size: 1.125rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-btn {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .hero-content {
+            padding: 0 2rem;
+        }
+        
+        .about-content {
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .artists-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .about-stats {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 0.875rem;
+        }
+        
+        .hero-description {
+            font-size: 1rem;
+        }
+        
+        .hero-content {
+            padding: 0 1rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .cta-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="hero-container">
+    <section class="hero-banner">
+        <div class="hero-content">
+            <p class="hero-subtitle">Welcome to EncoreHub</p>
+            <h1 class="hero-title">Connect Artists with Opportunities</h1>
+            <p class="hero-description">The premier platform for artists, venues, and managers to create amazing experiences together. Whether you're an artist looking for gigs or a venue seeking talent, EncoreHub makes booking seamless and efficient.</p>
+            
+            <div class="hero-buttons">
+                <a href="{% url 'account_signup' %}" class="hero-btn hero-btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Get Started
+                </a>
+                <a href="{% url 'artists:list' %}" class="hero-btn hero-btn-secondary">
+                    <i class="fas fa-search"></i>
+                    Browse Artists
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="EncoreHub Platform">
+            </div>
+            <div class="about-text">
+                <p class="section-subtitle">About EncoreHub</p>
+                <h2 class="section-title">Connecting Talent with Opportunity</h2>
+                <p class="section-description">
+                    EncoreHub is the premier platform that bridges the gap between talented artists and venues seeking exceptional entertainment. Our mission is to create seamless connections that result in unforgettable experiences for audiences worldwide.
+                </p>
+                <p class="section-description">
+                    Whether you're an artist looking to showcase your talent or a venue seeking the perfect performer, EncoreHub provides the tools, connections, and support you need to succeed in the entertainment industry.
+                </p>
+                
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Artists</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Venues</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Bookings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+    <div class="container">
+        <div class="text-center">
+            <p class="section-subtitle">Our Services</p>
+            <h2 class="section-title">Choose Your Path</h2>
+            <p class="section-description">Join the EncoreHub community and start your journey today</p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-music"></i>
+                </div>
+                <h3 class="service-title">For Artists</h3>
+                <p class="service-description">Create your profile, showcase your talent, and connect with venues and event organizers worldwide. Build your portfolio and grow your career.</p>
+                <a href="{% url 'account_signup' %}" class="service-btn">Join as Artist</a>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="service-title">For Venues</h3>
+                <p class="service-description">Find the perfect artists for your events, manage bookings, and streamline your entertainment needs with our comprehensive platform.</p>
+                <a href="{% url 'account_signup' %}" class="service-btn">Join as Venue</a>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="service-title">For Managers</h3>
+                <p class="service-description">Manage multiple artists, handle bookings, and grow your business with our comprehensive tools and professional support.</p>
+                <a href="{% url 'account_signup' %}" class="service-btn">Join as Manager</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Artists Section -->
+<section class="artists-section">
+    <div class="container">
+        <div class="text-center">
+            <p class="section-subtitle">Featured Artists</p>
+            <h2 class="section-title">Discover Amazing Talent</h2>
+            <p class="section-description">Meet some of the incredible artists who have found success through EncoreHub</p>
+        </div>
+        
+        <div class="artists-grid">
+            <div class="artist-card">
+                <div class="artist-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="artist-info">
+                    <h4 class="artist-name">Sarah Johnson</h4>
+                    <p class="artist-genre">Jazz Vocalist</p>
+                    <p class="artist-description">Award-winning jazz vocalist with over 10 years of experience performing in prestigious venues across New York.</p>
+                    <a href="#" class="artist-btn">View Profile</a>
+                </div>
+            </div>
+            
+            <div class="artist-card">
+                <div class="artist-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="artist-info">
+                    <h4 class="artist-name">Mike Chen</h4>
+                    <p class="artist-genre">Rock Guitarist</p>
+                    <p class="artist-description">Dynamic rock guitarist known for electrifying performances and innovative sound design in Los Angeles.</p>
+                    <a href="#" class="artist-btn">View Profile</a>
+                </div>
+            </div>
+            
+            <div class="artist-card">
+                <div class="artist-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="artist-info">
+                    <h4 class="artist-name">Emma Davis</h4>
+                    <p class="artist-genre">Pop Singer</p>
+                    <p class="artist-description">Versatile pop singer with a powerful voice and engaging stage presence, based in Nashville.</p>
+                    <a href="#" class="artist-btn">View Profile</a>
+                </div>
+            </div>
+            
+            <div class="artist-card">
+                <div class="artist-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="artist-info">
+                    <h4 class="artist-name">Alex Rodriguez</h4>
+                    <p class="artist-genre">Hip-Hop Artist</p>
+                    <p class="artist-description">Innovative hip-hop artist blending traditional rhythms with modern beats in Miami's vibrant music scene.</p>
+                    <a href="#" class="artist-btn">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Get Started?</h2>
+        <p class="cta-description">Join thousands of artists and venues who have already discovered the power of EncoreHub. Start your journey today and create unforgettable experiences.</p>
+        <a href="{% url 'account_signup' %}" class="cta-btn">
+            <i class="fas fa-rocket me-2"></i>
+            Start Your Journey
+        </a>
+    </div>
+</section>
+{% endblock %} 

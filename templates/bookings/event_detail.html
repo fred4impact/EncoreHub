@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'bookings:event_list' %}">Events</a></li>
+                    <li class="breadcrumb-item active">{{ event.title }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">{{ event.title }}</h1>
+                    <p class="text-muted mb-0">{{ event.get_event_type_display }} • {{ event.event_date|date:"F d, Y" }}</p>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if user.user_type == 'venue' and event.venue == user %}
+                    <a href="{% url 'bookings:edit_event' event.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Event
+                    </a>
+                    {% endif %}
+                    {% if user.user_type == 'artist' %}
+                        {% if existing_request %}
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-check me-2"></i>Request Submitted
+                            </button>
+                        {% else %}
+                            <a href="{% url 'bookings:create_booking_request' event.pk %}" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Request
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Event Details -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle text-primary me-2"></i>Event Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Event Information</h6>
+                            <p><strong>Type:</strong> {{ event.get_event_type_display }}</p>
+                            <p><strong>Date:</strong> {{ event.event_date|date:"l, F d, Y" }}</p>
+                            <p><strong>Time:</strong> {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}</p>
+                            {% if event.setup_time %}
+                            <p><strong>Setup Time:</strong> {{ event.setup_time|time:"g:i A" }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Location</h6>
+                            <p><strong>Venue:</strong> {{ event.venue_name|default:event.venue.get_full_name }}</p>
+                            <p><strong>Address:</strong> {{ event.address }}</p>
+                            <p><strong>City:</strong> {{ event.city }}, {{ event.state }} {{ event.country }}</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="text-muted">Description</h6>
+                    <p>{{ event.description }}</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Capacity & Attendance</h6>
+                            <p><strong>Expected Attendance:</strong> {{ event.expected_attendance }}</p>
+                            {% if event.capacity %}
+                            <p><strong>Venue Capacity:</strong> {{ event.capacity }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Budget & Payment</h6>
+                            <p><strong>Budget Range:</strong> {{ event.budget_range }}</p>
+                            {% if event.payment_terms %}
+                            <p><strong>Payment Terms:</strong> {{ event.payment_terms }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Requirements -->
+            {% if event.technical_requirements or event.equipment_provided or event.equipment_needed %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs text-primary me-2"></i>Technical Requirements
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if event.technical_requirements %}
+                    <h6 class="text-muted">Technical Requirements</h6>
+                    <p>{{ event.technical_requirements }}</p>
+                    {% endif %}
+                    
+                    {% if event.equipment_provided %}
+                    <h6 class="text-muted">Equipment Provided</h6>
+                    <p>{{ event.equipment_provided }}</p>
+                    {% endif %}
+                    
+                    {% if event.equipment_needed %}
+                    <h6 class="text-muted">Equipment Needed</h6>
+                    <p>{{ event.equipment_needed }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Event Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check text-primary me-2"></i>Event Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="badge bg-{% if event.status == 'published' %}success{% elif event.status == 'draft' %}secondary{% else %}warning{% endif %} me-2">
+                            {{ event.get_status_display }}
+                        </span>
+                        {% if event.is_featured %}
+                        <span class="badge bg-warning">Featured</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p><strong>Posted by:</strong> {{ event.venue.get_full_name|default:event.venue_name }}</p>
+                    <p><strong>Posted on:</strong> {{ event.created_at|date:"M d, Y" }}</p>
+                    
+                    {% if user.user_type == 'artist' %}
+                        {% if existing_request %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You have already submitted a booking request for this event.
+                        </div>
+                        {% else %}
+                        <div class="d-grid">
+                            <a href="{% url 'bookings:create_booking_request' event.pk %}" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Booking Request
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>Quick Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ event.booking_requests.count }}</h4>
+                            <small class="text-muted">Requests</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ event.bookings.count }}</h4>
+                            <small class="text-muted">Confirmed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
