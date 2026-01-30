@@ -1,19 +1,20 @@
 /* EncoreHub - Clean Professional Design */
 
-/* Custom CSS Variables */
+/* Custom CSS Variables - Gold accent */
 :root {
     --primary-color: #d4af37;
+    --primary-dark: #c19b2e;
     --secondary-color: #1a1a1a;
     --success-color: #d4af37;
     --info-color: #d4af37;
     --warning-color: #d4af37;
     --danger-color: #dc3545;
-    --light-color: #f8f9fa;
+    --light-color: #f0f2f5;
     --dark-color: #1a1a1a;
     --white: #ffffff;
     --black: #000000;
-    --gray-100: #f8f9fa;
-    --gray-200: #e9ecef;
+    --gray-100: #f0f2f5;
+    --gray-200: #e4e6eb;
     --gray-300: #dee2e6;
     --gray-400: #ced4da;
     --gray-500: #adb5bd;
@@ -21,10 +22,11 @@
     --gray-700: #495057;
     --gray-800: #343a40;
     --gray-900: #212529;
+    --page-bg: #f0f2f5;
     
-    /* Typography */
-    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Typography - Poppins bold like WhatsApp */
+    --font-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -37,7 +39,7 @@
     --radius-lg: 0.75rem;
 }
 
-/* Text Color Classes - Gold Theme */
+/* Text Color Classes - Gold theme */
 .text-primary {
     color: #d4af37 !important;
 }
@@ -97,7 +99,7 @@ a:hover {
     box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
 }
 
-/* Custom Gold Theme Classes */
+/* Custom gold theme classes (accent) */
 .text-gold {
     color: #d4af37 !important;
 }
@@ -137,23 +139,43 @@ a:hover {
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: var(--font-primary);
     line-height: 1.6;
     color: var(--black);
-    background-color: var(--white);
-    font-weight: 400;
-    font-size: 0.875rem;
+    background-color: var(--page-bg);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Typography */
+/* Nav stays at top, doesn't shrink */
+body > nav {
+    flex-shrink: 0;
+}
+
+/* Main content grows to push footer to bottom (sticky footer) */
+body > main {
+    flex: 1 0 auto;
+    min-height: 0;
+}
+
+/* Typography - bold like WhatsApp blog */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.2;
     color: var(--black);
     margin-bottom: 0.5rem;
 }
+
+h1, h2 { font-weight: 800; }
 
 h1 { font-size: 2.25rem; }
 h2 { font-size: 1.875rem; }
@@ -165,7 +187,8 @@ h6 { font-size: 1rem; }
 p {
     margin-bottom: 1rem;
     color: var(--black);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
 }
 
 /* Navigation Styles */
@@ -178,7 +201,7 @@ p {
 }
 
 .navbar-brand {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 1.5rem;
     color: #d4af37 !important;
     text-decoration: none;
@@ -193,7 +216,7 @@ p {
 }
 
 .navbar-nav .nav-link {
-    font-weight: 500;
+    font-weight: 700;
     color: var(--black) !important;
     padding: 0.5rem 1rem !important;
     border-radius: var(--radius-md);
@@ -228,14 +251,14 @@ p {
 
 .hero-section h1 {
     font-size: 3rem;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 1rem;
     color: var(--white);
 }
 
 .hero-section .lead {
     font-size: 1.25rem;
-    font-weight: 400;
+    font-weight: 600;
     margin-bottom: 2rem;
     opacity: 0.9;
     color: var(--white);
@@ -248,7 +271,7 @@ p {
 
 /* Button Styles */
 .btn {
-    font-weight: 500;
+    font-weight: 700;
     padding: 0.5rem 1rem;
     border-radius: var(--radius-md);
     border: none;
@@ -266,7 +289,7 @@ p {
     background: #d4af37;
     color: #1a1a1a;
     box-shadow: var(--shadow-sm);
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -296,7 +319,7 @@ p {
 .btn-success {
     background: #d4af37;
     color: #1a1a1a;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -311,7 +334,7 @@ p {
 .btn-info {
     background: #d4af37;
     color: #1a1a1a;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -326,7 +349,7 @@ p {
 .btn-warning {
     background: #d4af37;
     color: #1a1a1a;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -358,7 +381,7 @@ p {
     background: transparent;
     color: #d4af37;
     border: 2px solid #d4af37;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -459,7 +482,7 @@ p {
     font-size: 0.8125rem;
 }
 
-/* Card Styles */
+/* Card Styles - white on gray background like WhatsApp */
 .card {
     background: var(--white);
     border: 1px solid var(--gray-200);
@@ -467,6 +490,11 @@ p {
     box-shadow: var(--shadow-sm);
     transition: all 0.2s ease;
     overflow: hidden;
+}
+
+.card-header {
+    background: var(--white);
+    font-weight: 700;
 }
 
 .card:hover {
@@ -478,8 +506,15 @@ p {
     padding: 1.5rem;
 }
 
+/* Centred, medium-width cards for card-body text-center (e.g. dashboard welcome, empty states) */
+.card:has(.card-body.text-center) {
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .card-title {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--black);
     margin-bottom: 0.75rem;
     font-size: 1rem;
@@ -488,7 +523,8 @@ p {
 .card-text {
     color: var(--black);
     line-height: 1.5;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
 }
 
 /* Feature Cards */
@@ -575,15 +611,15 @@ p {
 
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
     outline: none;
 }
 
 .form-label {
-    font-weight: 500;
+    font-weight: 700;
     color: var(--black);
     margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
 }
 
 /* Alert Styles */
@@ -676,24 +712,27 @@ p {
     color: #721c24;
 }
 
-/* Footer */
+/* Footer - always stuck to bottom of viewport or below content */
+.site-footer,
 footer {
     background: var(--gray-900);
     color: var(--gray-300);
     padding: 2rem 0 1rem;
-    margin-top: 3rem;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 footer h5 {
     color: var(--white);
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 1rem;
 }
 
 footer p {
     color: var(--gray-400);
     margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
 }
 
 /* Utility Classes */

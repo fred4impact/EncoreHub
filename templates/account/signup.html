@@ -1,147 +1,133 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Sign Up - EncoreHub{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card border-0 shadow-lg mt-5">
-                <div class="card-body p-5">
-                    <!-- Header -->
-                    <div class="text-center mb-4">
-                        <div class="avatar avatar-xl rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3">
-                            <i class="fas fa-user-plus fa-2x text-white"></i>
-                        </div>
-                        <h2 class="mb-2">Join EncoreHub</h2>
-                        <p class="text-muted">Create your account and start your journey</p>
-                    </div>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="avatar">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2 class="auth-title">Join EncoreHub</h2>
+            <p class="auth-subtitle">Create your account and start connecting</p>
+        </div>
+        
+        <div class="auth-body">
+            <!-- Signup Form -->
+            <form method="post" action="{% url 'account_signup' %}">
+                {% csrf_token %}
+                {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
-                    <!-- Signup Form -->
-                    <form method="post" action="{% url 'account_signup' %}">
-                        {% csrf_token %}
-                        
-                        {% if redirect_field_value %}
-                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                        {% endif %}
-                        
-                        <!-- Email Field -->
-                        <div class="mb-3">
-                            <label for="id_email" class="form-label">Email Address</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-envelope"></i>
-                                </span>
-                                <input type="email" name="email" id="id_email" class="form-control" placeholder="Enter your email" required>
-                            </div>
-                        </div>
-                        
-                        <!-- Username Field -->
-                        <div class="mb-3">
-                            <label for="id_username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-user"></i>
-                                </span>
-                                <input type="text" name="username" id="id_username" class="form-control" placeholder="Choose a username" required>
-                            </div>
-                        </div>
-                        
-                        <!-- Password Field -->
-                        <div class="mb-3">
-                            <label for="id_password1" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Create a password" required>
-                            </div>
-                        </div>
-                        
-                        <!-- Confirm Password Field -->
-                        <div class="mb-3">
-                            <label for="id_password2" class="form-label">Confirm Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-lock"></i>
-                                </span>
-                                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Confirm your password" required>
-                            </div>
-                        </div>
-                        
-                        <!-- User Type Field -->
-                        <div class="mb-4">
-                            <label for="id_user_type" class="form-label">I am a...</label>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="radio" name="user_type" id="id_user_type_artist" value="artist" class="form-check-input" required>
-                                        <label class="form-check-label" for="id_user_type_artist">
-                                            <i class="fas fa-music me-2"></i>Artist
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="radio" name="user_type" id="id_user_type_venue" value="venue" class="form-check-input">
-                                        <label class="form-check-label" for="id_user_type_venue">
-                                            <i class="fas fa-building me-2"></i>Venue
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-check">
-                                        <input type="radio" name="user_type" id="id_user_type_manager" value="manager" class="form-check-input">
-                                        <label class="form-check-label" for="id_user_type_manager">
-                                            <i class="fas fa-user-tie me-2"></i>Manager
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Terms and Conditions -->
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" name="terms" id="id_terms" class="form-check-input" required>
-                            <label class="form-check-label" for="id_terms">
-                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-3">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+                {% if form.errors %}
+                <div class="alert alert-warning mb-3">
+                    <strong>Please fix the errors below:</strong>
+                    <ul class="mb-0 mt-1">{% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}</ul>
+                </div>
+                {% endif %}
+
+                <!-- User Type Selection - MOVED TO TOP -->
+                <div class="mb-4">
+                    <label for="id_user_type" class="form-label">I am a...</label>
+                    <div class="user-type-options">
+                        <div class="form-check">
+                            <input type="radio" name="user_type" id="id_user_type_artist" value="artist" class="form-check-input" required>
+                            <label class="form-check-label" for="id_user_type_artist">
+                                <i class="fas fa-music me-2"></i>
+                                <strong>Artist</strong>
+                                <small class="d-block text-muted">Musicians, singers, performers</small>
                             </label>
                         </div>
-                        
-                        <!-- Submit Button -->
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-user-plus me-2"></i>Create Account
-                            </button>
+                        <div class="form-check">
+                            <input type="radio" name="user_type" id="id_user_type_venue" value="venue" class="form-check-input">
+                            <label class="form-check-label" for="id_user_type_venue">
+                                <i class="fas fa-building me-2"></i>
+                                <strong>Venue</strong>
+                                <small class="d-block text-muted">Clubs, theaters, event spaces</small>
+                            </label>
                         </div>
-                    </form>
-
-                    <!-- Links -->
-                    <div class="text-center">
-                        <p class="mb-0">
-                            Already have an account? 
-                            <a href="{% url 'account_login' %}" class="text-decoration-none fw-bold">
-                                Sign in here
-                            </a>
-                        </p>
+                        <div class="form-check">
+                            <input type="radio" name="user_type" id="id_user_type_manager" value="manager" class="form-check-input">
+                            <label class="form-check-label" for="id_user_type_manager">
+                                <i class="fas fa-users me-2"></i>
+                                <strong>Manager</strong>
+                                <small class="d-block text-muted">Artist representatives, agents</small>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Quick Links -->
-            <div class="text-center mt-4">
-                <p class="text-muted mb-2">Need help?</p>
-                <div class="btn-group" role="group">
-                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-home me-1"></i>Home
-                    </a>
-                    <a href="#" class="btn btn-sm btn-outline-info">
-                        <i class="fas fa-question-circle me-1"></i>Help
-                    </a>
-                    <a href="#" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-envelope me-1"></i>Contact
-                    </a>
+                
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" name="email" id="id_email" class="form-control" placeholder="Enter your email" required>
+                    </div>
                 </div>
+                
+                <!-- Username Field -->
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" name="username" id="id_username" class="form-control" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                
+                <!-- Password Fields -->
+                <div class="mb-3">
+                    <label for="id_password1" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Create a password" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_password2" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="mb-4 form-check">
+                    <input type="checkbox" name="terms" id="id_terms" class="form-check-input" required>
+                    <label class="form-check-label" for="id_terms">
+                        I agree to the <a href="#" class="text-primary">Terms and Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Already have account -->
+            <div class="auth-footer">
+                <p class="text-center mb-0">
+                    Already have an account? 
+                    <a href="{% url 'account_login' %}" class="text-primary fw-bold">Sign In</a>
+                </p>
             </div>
         </div>
     </div>
@@ -150,54 +136,169 @@
 
 {% block extra_css %}
 <style>
-.avatar {
-    width: 80px;
-    height: 80px;
-}
-
-.card {
-    border-radius: 16px;
-}
-
-.btn {
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.btn-lg {
-    padding: 12px 24px;
-}
-
-.btn-group .btn {
-    border-radius: 6px;
-}
-
-.card-body {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-}
-
-.avatar {
-    background: linear-gradient(135deg, #d4af37 0%, #c19b2e 100%);
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-}
-
-.form-control:focus {
-    border-color: #d4af37;
-    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
-}
-
-.form-check-input:checked {
-    background-color: #d4af37;
-    border-color: #d4af37;
-}
-
-.form-check-label {
-    font-weight: 500;
-}
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem 1rem;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 600px;
+    }
+    
+    .auth-header {
+        background: linear-gradient(135deg, #d4af37 0%, #c19b2e 100%);
+        color: #1a1a1a;
+        padding: 2.5rem;
+        text-align: center;
+    }
+    
+    .avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(26, 26, 26, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        opacity: 0.9;
+        margin-bottom: 0;
+        font-size: 1rem;
+    }
+    
+    .auth-body {
+        padding: 2.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-group-text {
+        background: #f8f9fa;
+        border-color: #d4af37;
+        color: #d4af37;
+    }
+    
+    .form-control {
+        border-color: #e9ecef;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #d4af37;
+        box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: #d4af37;
+        border-color: #d4af37;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-check-label:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .form-check-input:checked + .form-check-label {
+        background-color: rgba(212, 175, 55, 0.1);
+        border: 1px solid #d4af37;
+    }
+    
+    .user-type-options {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #fafafa;
+    }
+    
+    .user-type-options .form-check {
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-type-options .form-check:last-child {
+        margin-bottom: 0;
+    }
+    
+    .btn-primary {
+        background: #d4af37;
+        border-color: #d4af37;
+        color: #1a1a1a;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: #c19b2e;
+        border-color: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .auth-footer {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .text-primary {
+        color: #d4af37 !important;
+    }
+    
+    .text-primary:hover {
+        color: #c19b2e !important;
+    }
+    
+    @media (max-width: 480px) {
+        .auth-container {
+            padding: 1rem;
+        }
+        
+        .auth-header {
+            padding: 1.5rem;
+        }
+        
+        .auth-body {
+            padding: 1.5rem;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+        }
+    }
 </style>
 {% endblock %} 

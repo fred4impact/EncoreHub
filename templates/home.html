@@ -701,53 +701,21 @@
         </div>
         
         <div class="artists-grid">
+            {% for portfolio in featured_artists %}
             <div class="artist-card">
                 <div class="artist-image">
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="artist-info">
-                    <h4 class="artist-name">Sarah Johnson</h4>
-                    <p class="artist-genre">Jazz Vocalist</p>
-                    <p class="artist-description">Award-winning jazz vocalist with over 10 years of experience performing in prestigious venues across New York.</p>
-                    <a href="#" class="artist-btn">View Profile</a>
+                    <h4 class="artist-name">{{ portfolio.get_artist_display_name }}</h4>
+                    <p class="artist-genre">{% if portfolio.headline %}{{ portfolio.headline }}{% elif portfolio.genres %}{{ portfolio.genres.0 }}{% else %}Artist{% endif %}</p>
+                    <p class="artist-description">{{ portfolio.bio|truncatewords:25|default:"Check out this artist on EncoreHub." }}</p>
+                    <a href="{% url 'artists:detail' portfolio.pk %}" class="artist-btn">View Profile</a>
                 </div>
             </div>
-            
-            <div class="artist-card">
-                <div class="artist-image">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="artist-info">
-                    <h4 class="artist-name">Mike Chen</h4>
-                    <p class="artist-genre">Rock Guitarist</p>
-                    <p class="artist-description">Dynamic rock guitarist known for electrifying performances and innovative sound design in Los Angeles.</p>
-                    <a href="#" class="artist-btn">View Profile</a>
-                </div>
-            </div>
-            
-            <div class="artist-card">
-                <div class="artist-image">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="artist-info">
-                    <h4 class="artist-name">Emma Davis</h4>
-                    <p class="artist-genre">Pop Singer</p>
-                    <p class="artist-description">Versatile pop singer with a powerful voice and engaging stage presence, based in Nashville.</p>
-                    <a href="#" class="artist-btn">View Profile</a>
-                </div>
-            </div>
-            
-            <div class="artist-card">
-                <div class="artist-image">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="artist-info">
-                    <h4 class="artist-name">Alex Rodriguez</h4>
-                    <p class="artist-genre">Hip-Hop Artist</p>
-                    <p class="artist-description">Innovative hip-hop artist blending traditional rhythms with modern beats in Miami's vibrant music scene.</p>
-                    <a href="#" class="artist-btn">View Profile</a>
-                </div>
-            </div>
+            {% empty %}
+            <p class="text-center text-muted">No artists have joined yet. Be the first to <a href="{% url 'account_signup' %}">sign up</a>!</p>
+            {% endfor %}
         </div>
     </div>
 </section>

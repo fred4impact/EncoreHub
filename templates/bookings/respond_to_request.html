@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Respond to Request - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 text-center">
+                    <h2 class="h4 mb-3">
+                        <i class="fas fa-reply text-primary me-2"></i>Respond to booking request
+                    </h2>
+                    <p class="text-muted mb-4">
+                        {% if booking_request.event %}
+                            <strong>{{ booking_request.event.title }}</strong> — {{ booking_request.artist.get_full_name|default:booking_request.artist.email }}
+                        {% else %}
+                            <strong>{{ booking_request.event_name|default:"Direct booking" }}</strong>{% if booking_request.requester %} — from {{ booking_request.requester.get_full_name|default:booking_request.requester.email }}{% endif %}
+                        {% endif %}
+                    </p>
+                    <p class="mb-4">Do you want to accept or decline this request?</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="response" value="accepted">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check me-2"></i>Accept
+                            </button>
+                        </form>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="response" value="declined">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-times me-2"></i>Decline
+                            </button>
+                        </form>
+                        <a href="{% url 'bookings:request_detail' booking_request.pk %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

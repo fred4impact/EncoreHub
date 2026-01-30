@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q
 from datetime import datetime, timedelta
+from decimal import Decimal
 from .models import Event, BookingRequest, Booking, Contract
 from .forms import EventForm, BookingRequestForm, DirectArtistBookingForm
 
@@ -194,11 +195,23 @@ def request_detail(request, pk):
 
 @login_required
 def respond_to_request(request, pk):
-    """Respond to a booking request (accept/decline)."""
-    booking_request = get_object_or_404(BookingRequest, pk=pk, event__venue=request.user)
+    """Respond to a booking request (accept/decline). Venue responds to event-based requests; artist responds to direct requests."""
+    booking_request = get_object_or_404(BookingRequest, pk=pk)
+    # Who can respond: venue for event-based, artist for direct
+    can_respond = False
+    if booking_request.event:
+        can_respond = booking_request.event.venue_id == request.user.id
+    else:
+        can_respond = booking_request.artist_id == request.user.id
+    if not can_respond:
+        messages.error(request, 'You do not have permission to respond to this request.')
+        return redirect('bookings:request_detail', pk=pk)
     
     if booking_request.status != 'pending':
         messages.error(request, 'This request has already been responded to.')
+        return redirect('bookings:request_detail', pk=pk)
+    if booking_request.is_expired:
+        messages.error(request, 'This request has expired.')
         return redirect('bookings:request_detail', pk=pk)
     
     if request.method == 'POST':
@@ -208,34 +221,31 @@ def respond_to_request(request, pk):
             booking_request.responded_at = timezone.now()
             booking_request.save()
             
-            if response == 'accepted':
-                # Create a booking
+            if response == 'accepted' and booking_request.event:
+                # Create a booking (only for event-based requests; Booking requires event)
                 booking = Booking.objects.create(
                     booking_request=booking_request,
                     event=booking_request.event,
                     artist=booking_request.artist,
-                    venue=request.user,
+                    venue=booking_request.event.venue,
                     manager=booking_request.manager,
-                    agreed_fee=booking_request.proposed_fee,
-                    performance_duration=timedelta(hours=2),  # Default 2 hours
+                    agreed_fee=booking_request.proposed_fee or Decimal('0'),
+                    performance_duration=timedelta(hours=2),
                 )
-                
-                # Create a contract
                 Contract.objects.create(
                     booking=booking,
                     terms_and_conditions="Standard performance contract terms...",
                     expires_at=timezone.now() + timedelta(days=30)
                 )
-                
                 messages.success(request, 'Booking request accepted! A booking has been created.')
+            elif response == 'accepted' and not booking_request.event:
+                messages.success(request, 'Booking request accepted! You can coordinate details with the requester.')
             else:
                 messages.success(request, 'Booking request declined.')
             
             return redirect('bookings:my_requests')
     
-    context = {
-        'booking_request': booking_request
-    }
+    context = {'booking_request': booking_request}
     return render(request, 'bookings/respond_to_request.html', context)
 
 
@@ -304,14 +314,20 @@ def event_search_api(request):
 
 @login_required
 def create_artist_booking_request(request, portfolio_pk):
-    """Create a booking request for an artist (direct booking)."""
-    if request.user.user_type not in ['venue', 'manager']:
-        messages.error(request, 'Only venues and managers can book artists directly.')
-        return redirect('artists:detail', pk=portfolio_pk)
-    
+    """Create a booking request for an artist (direct booking). Only venues and managers can book; artists cannot book themselves."""
     from apps.artists.models import ArtistPortfolio
     portfolio = get_object_or_404(ArtistPortfolio, pk=portfolio_pk)
-    
+
+    # Artists cannot book themselves
+    if request.user == portfolio.artist:
+        messages.error(request, 'You cannot book yourself.')
+        return redirect('artists:detail', pk=portfolio_pk)
+
+    # Only venues and managers can book artists
+    if request.user.user_type not in ('venue', 'manager'):
+        messages.error(request, 'Only venues and managers can book artists. Please log in with a venue or manager account.')
+        return redirect('artists:detail', pk=portfolio_pk)
+
     # Check if request already exists
     existing_request = BookingRequest.objects.filter(
         artist=portfolio.artist,

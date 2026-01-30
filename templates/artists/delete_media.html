@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Media - EncoreHub{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-trash-alt fa-3x text-danger"></i>
+                        </div>
+                        <h2 class="h4 mb-2">Delete media?</h2>
+                        <p class="text-muted mb-3">Are you sure you want to remove <strong>{{ media.title }}</strong> from your portfolio? This cannot be undone.</p>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Yes, delete
+                            </button>
+                        </form>
+                        <a href="{% url 'artists:my_portfolio' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

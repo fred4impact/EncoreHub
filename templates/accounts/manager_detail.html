@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ manager.company_name|default:manager.user.get_full_name }} - Manager Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .manager-detail {
+        padding: 2rem 0;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .manager-hero {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-content {
+        text-align: center;
+    }
+    
+    .manager-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #d4af37;
+    }
+    
+    .manager-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+    }
+    
+    .verification-badge {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .manager-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .manager-sidebar {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+    
+    .manager-main {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .profile-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #d4af37;
+    }
+    
+    .profile-info {
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+        color: #333;
+        font-size: 1.1rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #d4af37;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .contact-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        background: #d4af37;
+        color: #1a1a1a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .contact-text {
+        color: #333;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        flex: 1;
+        background: #d4af37;
+        color: #1a1a1a;
+        text-decoration: none;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+        background: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .btn-secondary {
+        flex: 1;
+        background: #1a1a1a;
+        color: white;
+        text-decoration: none;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #333;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .artists-section {
+        margin-top: 2rem;
+    }
+    
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .artist-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .artist-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .artist-avatar {
+        width: 80px;
+        height: 80px;
+        background: #d4af37;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: #1a1a1a;
+    }
+    
+    .artist-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .artist-genre {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    
+    .artist-rate {
+        color: #d4af37;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .no-artists {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+    
+    .no-artists i {
+        font-size: 3rem;
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .manager-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .artists-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="manager-detail">
+    <!-- Manager Hero Section -->
+    <div class="manager-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="manager-title">{{ manager.company_name|default:manager.user.get_full_name }}</h1>
+                <p class="manager-subtitle">
+                    {% if manager.specialization %}
+                        Specializing in {{ manager.specialization }}
+                    {% else %}
+                        Professional Music Manager
+                    {% endif %}
+                </p>
+                <div class="verification-badge">
+                    <i class="fas fa-check-circle me-2"></i>Verified Manager
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="manager-content">
+            <!-- Manager Sidebar -->
+            <div class="manager-sidebar">
+                <!-- Profile Information -->
+                <div class="profile-section">
+                    <h3 class="section-title">Profile Information</h3>
+                    
+                    <div class="profile-info">
+                        <div class="info-label">Manager Name</div>
+                        <div class="info-value">{{ manager.user.get_full_name }}</div>
+                    </div>
+                    
+                    {% if manager.company_name %}
+                        <div class="profile-info">
+                            <div class="info-label">Company</div>
+                            <div class="info-value">{{ manager.company_name }}</div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if manager.specialization %}
+                        <div class="profile-info">
+                            <div class="info-label">Specialization</div>
+                            <div class="info-value">{{ manager.specialization }}</div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if manager.city or manager.state or manager.country %}
+                        <div class="profile-info">
+                            <div class="info-label">Location</div>
+                            <div class="info-value">
+                                {% if manager.city %}{{ manager.city }}{% endif %}
+                                {% if manager.state %}, {{ manager.state }}{% endif %}
+                                {% if manager.country %}, {{ manager.country }}{% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Statistics -->
+                <div class="profile-section">
+                    <h3 class="section-title">Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">{{ manager.experience_years }}</span>
+                            <span class="stat-label">Years Experience</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">{{ manager.client_count }}</span>
+                            <span class="stat-label">Artists Managed</span>
+                        </div>
+                    </div>
+                    
+                    {% if manager.commission_rate %}
+                        <div class="profile-info">
+                            <div class="info-label">Commission Rate</div>
+                            <div class="info-value">{{ manager.commission_rate }}%</div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="profile-section">
+                    <h3 class="section-title">Contact Information</h3>
+                    <div class="contact-info">
+                        {% if manager.phone %}
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="contact-text">{{ manager.phone }}</div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if manager.user.email %}
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-text">{{ manager.user.email }}</div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if manager.website %}
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <a href="{{ manager.website }}" target="_blank" style="color: #d4af37;">{{ manager.website }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if manager.linkedin %}
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fab fa-linkedin"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <a href="https://linkedin.com/in/{{ manager.linkedin }}" target="_blank" style="color: #d4af37;">{{ manager.linkedin }}</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="#" class="btn-primary">
+                        <i class="fas fa-calendar-plus me-2"></i>Request Booking
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <i class="fas fa-envelope me-2"></i>Send Message
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Manager Main Content -->
+            <div class="manager-main">
+                <!-- Bio Section -->
+                {% if manager.bio %}
+                    <div class="profile-section">
+                        <h3 class="section-title">About</h3>
+                        <p style="line-height: 1.8; color: #666;">{{ manager.bio }}</p>
+                    </div>
+                {% endif %}
+                
+                <!-- Artists Section -->
+                <div class="artists-section">
+                    <h3 class="section-title">Artists Represented</h3>
+                    
+                    {% if managed_artists %}
+                        <div class="artists-grid">
+                            {% for artist in managed_artists %}
+                                <div class="artist-card">
+                                    <div class="artist-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="artist-name">{{ artist.user.get_full_name }}</div>
+                                    <div class="artist-genre">{{ artist.genre|default:"Multi-genre" }}</div>
+                                    {% if artist.hourly_rate %}
+                                        <div class="artist-rate">${{ artist.hourly_rate }}/hour</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-artists">
+                            <i class="fas fa-users"></i>
+                            <h4>No Artists Listed Yet</h4>
+                            <p>This manager hasn't added their artist roster yet. Check back soon!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 class User(AbstractUser):
@@ -13,7 +14,7 @@ class User(AbstractUser):
     ]
     
     user_type = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=USER_TYPE_CHOICES,
         blank=True,
         null=True,
@@ -33,12 +34,17 @@ class User(AbstractUser):
         help_text=_('150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
     )
     
+    phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    bio = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
     
     def __str__(self):
-        return self.email
+        return f"{self.username} ({self.get_user_type_display()})"
     
     @property
     def is_artist(self):
@@ -137,6 +143,12 @@ class VenueProfile(models.Model):
 class ManagerProfile(models.Model):
     """Profile for managers with specific fields."""
     
+    VERIFICATION_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='manager_profile')
     
     # Manager info
@@ -158,6 +170,20 @@ class ManagerProfile(models.Model):
     website = models.URLField(blank=True)
     linkedin = models.CharField(max_length=100, blank=True)
     
+    # Verification System - NEW FIELDS
+    business_license = models.FileField(upload_to='licenses/', blank=True, null=True)
+    verification_status = models.CharField(
+        max_length=20, 
+        choices=VERIFICATION_STATUS_CHOICES, 
+        default='pending'
+    )
+    verification_date = models.DateTimeField(blank=True, null=True)
+    verification_notes = models.TextField(blank=True)
+    business_address = models.TextField(blank=True)
+    business_phone = models.CharField(max_length=20, blank=True)
+    references = models.TextField(blank=True, help_text="Professional references")
+    client_count = models.PositiveIntegerField(default=0, help_text="Number of artists currently managed")
+    
     # Profile status
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -170,4 +196,28 @@ class ManagerProfile(models.Model):
         verbose_name_plural = _('manager profiles')
     
     def __str__(self):
-        return f"{self.user.get_full_name()} - Manager Profile"
+        return f"{self.company_name or self.user.get_full_name()} - Manager Profile"
+    
+    @property
+    def verification_status_display(self):
+        return dict(self.VERIFICATION_STATUS_CHOICES).get(self.verification_status, 'Unknown')
+    
+    @property
+    def can_manage_artists(self):
+        return self.verification_status == 'verified' and self.client_count > 0
+    
+    def mark_verified(self, notes=""):
+        """Mark manager as verified with optional notes."""
+        from django.utils import timezone
+        self.verification_status = 'verified'
+        self.verification_date = timezone.now()
+        self.verification_notes = notes
+        self.is_verified = True
+        self.save()
+    
+    def mark_rejected(self, notes=""):
+        """Mark manager as rejected with optional notes."""
+        self.verification_status = 'rejected'
+        self.verification_notes = notes
+        self.is_verified = False
+        self.save()

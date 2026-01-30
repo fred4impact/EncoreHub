@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discover Music Managers - EncoreHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .manager-discovery {
+        padding: 2rem 0;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .discovery-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: white;
+        padding: 3rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .discovery-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #d4af37;
+    }
+    
+    .discovery-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .search-filters {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .filter-row {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: #d4af37;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+    
+    .search-btn {
+        background: #d4af37;
+        color: #1a1a1a;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .search-btn:hover {
+        background: #c19b2e;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    .results-summary {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .results-count {
+        font-size: 1.1rem;
+        color: #666;
+    }
+    
+    .managers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .manager-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .manager-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .manager-header {
+        background: linear-gradient(135deg, #d4af37 0%, #c19b2e 100%);
+        color: #1a1a1a;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .manager-company {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .manager-name {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .manager-body {
+        padding: 1.5rem;
+    }
+    
+    .manager-specialization {
+        background: #f8f9fa;
+        color: #d4af37;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+    
+    .manager-bio {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .manager-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #d4af37;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .manager-location {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .manager-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-view {
+        flex: 1;
+        background: #1a1a1a;
+        color: white;
+        text-decoration: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view:hover {
+        background: #333;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-contact {
+        flex: 1;
+        background: #d4af37;
+        color: #1a1a1a;
+        text-decoration: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-contact:hover {
+        background: #c19b2e;
+        color: #1a1a1a;
+        transform: translateY(-2px);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .page-link {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #666;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover,
+    .page-link.active {
+        background: #d4af37;
+        color: #1a1a1a;
+        border-color: #d4af37;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+    
+    .no-results i {
+        font-size: 3rem;
+        color: #d4af37;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .filter-row {
+            flex-direction: column;
+        }
+        
+        .filter-group {
+            min-width: 100%;
+        }
+        
+        .managers-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .manager-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="manager-discovery">
+    <!-- Discovery Header -->
+    <div class="discovery-header">
+        <div class="container">
+            <h1 class="discovery-title">Discover Music Managers</h1>
+            <p class="discovery-subtitle">
+                Connect with verified music managers who represent talented artists. 
+                Find the perfect match for your event or venue.
+            </p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-filters">
+            <form method="get" action="{% url 'accounts:manager_discovery' %}">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search">Search Managers</label>
+                        <input type="text" id="search" name="search" 
+                               value="{{ search_query }}" 
+                               placeholder="Search by name, company, or specialization...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="specialization">Specialization</label>
+                        <select id="specialization" name="specialization">
+                            <option value="">All Specializations</option>
+                            {% for spec in specializations %}
+                                <option value="{{ spec }}" {% if specialization == spec %}selected{% endif %}>
+                                    {{ spec }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="location">Location</label>
+                        <select id="location" name="location">
+                            <option value="">All Locations</option>
+                            {% for city, state, country in locations %}
+                                <option value="{{ city }}" {% if location == city %}selected{% endif %}>
+                                    {% if city %}{{ city }}{% endif %}{% if state %}, {{ state }}{% endif %}{% if country %}, {{ country }}{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search me-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Results Summary -->
+        <div class="results-summary">
+            <p class="results-count">
+                Found <strong>{{ total_managers }}</strong> verified manager{{ total_managers|pluralize }}
+                {% if search_query or specialization or location %}
+                    matching your criteria
+                {% endif %}
+            </p>
+        </div>
+        
+        <!-- Managers Grid -->
+        {% if page_obj %}
+            <div class="managers-grid">
+                {% for manager in page_obj %}
+                    <div class="manager-card">
+                        <div class="manager-header">
+                            <div class="manager-company">{{ manager.company_name|default:manager.user.get_full_name }}</div>
+                            <div class="manager-name">{{ manager.user.get_full_name }}</div>
+                        </div>
+                        
+                        <div class="manager-body">
+                            {% if manager.specialization %}
+                                <div class="manager-specialization">{{ manager.specialization }}</div>
+                            {% endif %}
+                            
+                            {% if manager.bio %}
+                                <p class="manager-bio">{{ manager.bio }}</p>
+                            {% endif %}
+                            
+                            <div class="manager-stats">
+                                <div class="stat-item">
+                                    <span class="stat-number">{{ manager.experience_years }}</span>
+                                    <span class="stat-label">Years Experience</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">{{ manager.client_count }}</span>
+                                    <span class="stat-label">Artists Managed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="manager-location">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {% if manager.city %}{{ manager.city }}{% endif %}
+                                {% if manager.state %}, {{ manager.state }}{% endif %}
+                                {% if manager.country %}, {{ manager.country }}{% endif %}
+                            </div>
+                            
+                            <div class="manager-actions">
+                                <a href="{% url 'accounts:manager_detail' manager.id %}" class="btn-view">
+                                    <i class="fas fa-eye me-1"></i>View Profile
+                                </a>
+                                <a href="#" class="btn-contact">
+                                    <i class="fas fa-envelope me-1"></i>Contact
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if specialization %}&specialization={{ specialization }}{% endif %}{% if location %}&location={{ location }}{% endif %}" class="page-link">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="page-link active">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if specialization %}&specialization={{ specialization }}{% endif %}{% if location %}&location={{ location }}{% endif %}" class="page-link">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if specialization %}&specialization={{ specialization }}{% endif %}{% if location %}&location={{ location }}{% endif %}" class="page-link">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>No managers found</h3>
+                <p>Try adjusting your search criteria or check back later for new managers.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

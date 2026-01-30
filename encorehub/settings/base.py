@@ -160,9 +160,10 @@ LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'home'
 ACCOUNT_EMAIL_CONFIRMATION_REDIRECT_URL = 'accounts:dashboard'
 
-# Custom signup form
+# Custom signup form and adapter (ensures user_type + ManagerProfile/ArtistProfile/VenueProfile on signup)
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.EncoreHubAccountAdapter'
 ACCOUNT_FORMS = {
-    'signup': 'apps.accounts.forms.CustomSignupForm',
+    'signup': 'apps.accounts.forms.CustomUserCreationForm',
 }
 
 # Email settings

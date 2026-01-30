@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Request - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-paper-plane text-primary me-2"></i>Booking Request
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if booking_request.event %}
+                            {{ booking_request.event.title }}
+                        {% else %}
+                            {{ booking_request.event_name|default:"Direct booking request" }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    {% if booking_request.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif booking_request.status == 'accepted' %}
+                        <span class="badge bg-success">Accepted</span>
+                    {% elif booking_request.status == 'declined' %}
+                        <span class="badge bg-danger">Declined</span>
+                    {% elif booking_request.status == 'expired' %}
+                        <span class="badge bg-secondary">Expired</span>
+                    {% elif booking_request.status == 'cancelled' %}
+                        <span class="badge bg-secondary">Cancelled</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ booking_request.get_status_display }}</span>
+                    {% endif %}
+                    {% if booking_request.is_expired and booking_request.status == 'pending' %}
+                        <span class="badge bg-danger">Expired</span>
+                    {% endif %}
+                    <a href="{% url 'bookings:my_requests' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Requests
+                    </a>
+                    {% if booking_request.status == 'pending' and not booking_request.is_expired %}
+                        {% if user_type == 'venue' and booking_request.event %}
+                            <form method="post" action="{% url 'bookings:respond_to_request' booking_request.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="response" value="accepted">
+                                <button type="submit" class="btn btn-success"><i class="fas fa-check me-2"></i>Accept</button>
+                            </form>
+                            <form method="post" action="{% url 'bookings:respond_to_request' booking_request.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="response" value="declined">
+                                <button type="submit" class="btn btn-danger"><i class="fas fa-times me-2"></i>Decline</button>
+                            </form>
+                        {% elif user_type == 'artist' and not booking_request.event %}
+                            <form method="post" action="{% url 'bookings:respond_to_request' booking_request.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="response" value="accepted">
+                                <button type="submit" class="btn btn-success"><i class="fas fa-check me-2"></i>Accept</button>
+                            </form>
+                            <form method="post" action="{% url 'bookings:respond_to_request' booking_request.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="response" value="declined">
+                                <button type="submit" class="btn btn-danger"><i class="fas fa-times me-2"></i>Decline</button>
+                            </form>
+                        {% elif user_type == 'venue' and not booking_request.event %}
+                            <span class="text-muted small">Waiting for artist to respond</span>
+                        {% else %}
+                            <a href="{% url 'bookings:respond_to_request' booking_request.pk %}" class="btn btn-primary"><i class="fas fa-reply me-2"></i>Respond</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Event / Request details -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Request Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if booking_request.event %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Event</label>
+                            <p class="mb-0 fw-bold">{{ booking_request.event.title }}</p>
+                            <small class="text-muted">{{ booking_request.event.get_event_type_display }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Date</label>
+                            <p class="mb-0">{{ booking_request.event.event_date|date:"F d, Y" }}</p>
+                            {% if booking_request.event.city %}<small class="text-muted">{{ booking_request.event.city }}{% if booking_request.event.state %}, {{ booking_request.event.state }}{% endif %}</small>{% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Event name</label>
+                            <p class="mb-0 fw-bold">{{ booking_request.event_name|default:"—" }}</p>
+                            {% if booking_request.event_type %}<small class="text-muted">{{ booking_request.event_type }}</small>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Date / time</label>
+                            <p class="mb-0">
+                                {% if booking_request.event_date %}{{ booking_request.event_date|date:"F d, Y" }}{% else %}—{% endif %}
+                                {% if booking_request.event_time %}<br><small class="text-muted">{{ booking_request.event_time }}</small>{% endif %}
+                            </p>
+                            {% if booking_request.venue_location %}<small class="text-muted">{{ booking_request.venue_location }}</small>{% endif %}
+                        </div>
+                    </div>
+                    {% if booking_request.duration or booking_request.audience_size or booking_request.budget %}
+                    <div class="row mb-3">
+                        {% if booking_request.duration %}<div class="col-md-4"><label class="text-muted small">Duration</label><p class="mb-0">{{ booking_request.duration }}</p></div>{% endif %}
+                        {% if booking_request.audience_size %}<div class="col-md-4"><label class="text-muted small">Audience size</label><p class="mb-0">{{ booking_request.audience_size }}</p></div>{% endif %}
+                        {% if booking_request.budget %}<div class="col-md-4"><label class="text-muted small">Budget</label><p class="mb-0">{{ booking_request.budget }}</p></div>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
+                    {% if booking_request.message %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Message</label>
+                        <p class="mb-0">{{ booking_request.message }}</p>
+                    </div>
+                    {% endif %}
+                    {% if booking_request.description %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Description</label>
+                        <p class="mb-0">{{ booking_request.description }}</p>
+                    </div>
+                    {% endif %}
+                    {% if booking_request.special_requirements %}
+                    <div class="mb-0">
+                        <label class="text-muted small">Special requirements</label>
+                        <p class="mb-0">{{ booking_request.special_requirements }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: People & fee -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>People</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Artist</label>
+                        <p class="mb-0 fw-bold">{{ booking_request.artist.get_full_name|default:booking_request.artist.email }}</p>
+                    </div>
+                    {% if booking_request.event %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Venue</label>
+                        <p class="mb-0">{{ booking_request.event.venue.get_full_name|default:booking_request.event.venue.email }}</p>
+                    </div>
+                    {% elif booking_request.requester %}
+                    <div class="mb-3">
+                        <label class="text-muted small">Requester</label>
+                        <p class="mb-0">{{ booking_request.requester.get_full_name|default:booking_request.requester.email }}</p>
+                        {% if booking_request.requester_type %}<small class="text-muted">{{ booking_request.get_requester_type_display }}</small>{% endif %}
+                    </div>
+                    {% endif %}
+                    {% if booking_request.manager %}
+                    <div class="mb-0">
+                        <label class="text-muted small">Manager</label>
+                        <p class="mb-0">{{ booking_request.manager.get_full_name|default:booking_request.manager.email }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Fee</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0 fs-5 fw-bold">
+                        {% if booking_request.proposed_fee %}
+                            ${{ booking_request.proposed_fee }}
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <label class="text-muted small">Requested</label>
+                    <p class="mb-1">{{ booking_request.created_at|date:"F d, Y g:i A" }}</p>
+                    <label class="text-muted small">Expires</label>
+                    <p class="mb-0">{{ booking_request.expires_at|date:"F d, Y g:i A" }}</p>
+                    {% if booking_request.responded_at %}
+                    <label class="text-muted small mt-2 d-block">Responded</label>
+                    <p class="mb-0">{{ booking_request.responded_at|date:"F d, Y g:i A" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

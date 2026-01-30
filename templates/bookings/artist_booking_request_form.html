@@ -251,7 +251,7 @@
             <div class="artist-details">
                 <h3>{{ portfolio.artist.get_full_name }}</h3>
                 <p>{{ portfolio.headline|default:"Professional Artist" }}</p>
-                <p class="artist-rate">Base Rate: ${{ portfolio.base_rate }}</p>
+                <p class="artist-rate">Rate: ${{ portfolio.get_display_rate }}/hr</p>
             </div>
         </div>
     </div>

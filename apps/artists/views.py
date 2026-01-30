@@ -1,32 +1,80 @@
+import re
+from datetime import timedelta
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db import connection
 from django.db.models import Q, Avg
 from django.core.paginator import Paginator
 from .models import ArtistPortfolio, PortfolioMedia, Performance, Availability, ArtistReview
 from .forms import ArtistPortfolioForm, PortfolioMediaForm, PerformanceForm, AvailabilityForm
 
 
+def _parse_duration(value):
+    """Convert duration string to timedelta. Accepts: '90', '2 hours', '1:30', '1:30:00'."""
+    if not value or not str(value).strip():
+        return timedelta(minutes=0)
+    s = str(value).strip().lower()
+    # Integer only -> minutes
+    if s.isdigit():
+        return timedelta(minutes=int(s))
+    # "N hour(s)" or "N hr(s)"
+    m = re.match(r'^(\d+)\s*(?:hours?|hrs?)\s*$', s)
+    if m:
+        return timedelta(hours=int(m.group(1)))
+    # "N minute(s)" or "N min(s)"
+    m = re.match(r'^(\d+)\s*(?:minutes?|mins?)\s*$', s)
+    if m:
+        return timedelta(minutes=int(m.group(1)))
+    # H:MM or H:MM:SS
+    parts = s.split(':')
+    if len(parts) == 2:
+        try:
+            h, m = int(parts[0]), int(parts[1])
+            return timedelta(hours=h, minutes=m)
+        except ValueError:
+            pass
+    if len(parts) == 3:
+        try:
+            h, m, sec = int(parts[0]), int(parts[1]), int(parts[2])
+            return timedelta(hours=h, minutes=m, seconds=sec)
+        except ValueError:
+            pass
+    return timedelta(minutes=0)
+
+
 def artist_list(request):
     """List all artists with filtering and search."""
     artists = ArtistPortfolio.objects.filter(is_available=True)
-    
+    supports_json_contains = connection.vendor != 'sqlite'
+
     # Search functionality
     search_query = request.GET.get('search')
     if search_query:
-        artists = artists.filter(
+        search_q = (
             Q(artist__first_name__icontains=search_query) |
             Q(artist__last_name__icontains=search_query) |
             Q(headline__icontains=search_query) |
-            Q(bio__icontains=search_query) |
-            Q(genres__contains=[search_query])
+            Q(bio__icontains=search_query)
         )
-    
-    # Filter by genre
+        if supports_json_contains:
+            search_q |= Q(genres__contains=[search_query])
+        artists = artists.filter(search_q)
+
+    # Filter by genre (JSONField contains not supported on SQLite)
     genre = request.GET.get('genre')
     if genre:
-        artists = artists.filter(genres__contains=[genre])
+        if supports_json_contains:
+            artists = artists.filter(genres__contains=[genre])
+        else:
+            pks = list(artists.values_list('pk', flat=True))
+            filtered_pks = [
+                p.pk for p in ArtistPortfolio.objects.filter(pk__in=pks)
+                if p.genres and genre in p.genres
+            ]
+            artists = artists.filter(pk__in=filtered_pks)
     
     # Filter by location
     city = request.GET.get('city')
@@ -59,10 +107,12 @@ def artist_list(request):
     return render(request, 'artists/artist_list.html', context)
 
 
-@login_required
 def artist_detail(request, pk):
-    """Show artist portfolio details."""
-    portfolio = get_object_or_404(ArtistPortfolio, pk=pk)
+    """Show artist portfolio details (public page from discovery)."""
+    portfolio = get_object_or_404(
+        ArtistPortfolio.objects.select_related('artist', 'artist__artist_profile'),
+        pk=pk
+    )
     
     # Get featured media
     featured_media = portfolio.media.filter(is_featured=True).order_by('display_order')
@@ -76,12 +126,16 @@ def artist_detail(request, pk):
     # Calculate average rating
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
     
+    # Availability for display: show all set by artist (no date filter so timezone doesn't hide entries)
+    availability = portfolio.artist.availability.all().order_by('date')[:60]
+    
     context = {
         'portfolio': portfolio,
         'featured_media': featured_media,
         'recent_performances': recent_performances,
         'reviews': reviews,
         'avg_rating': avg_rating,
+        'availability': availability,
     }
     return render(request, 'artists/artist_detail.html', context)
 
@@ -209,14 +263,15 @@ def add_performance(request):
         rating = request.POST.get('rating')
         
         if title and venue_name and event_date:
+            duration_timedelta = _parse_duration(duration)
             performance = Performance.objects.create(
                 portfolio=portfolio,
                 title=title,
                 venue_name=venue_name,
                 event_date=event_date,
                 event_type=event_type,
-                duration=duration,
-                audience_size=audience_size if audience_size else None,
+                duration=duration_timedelta,
+                audience_size=int(audience_size) if audience_size else None,
                 description=description,
                 client_feedback=client_feedback,
                 rating=int(rating) if rating else None,
@@ -298,7 +353,7 @@ def artist_search_api(request):
         'name': f"{artist.artist.first_name} {artist.artist.last_name}",
         'headline': artist.headline,
         'genres': artist.genres,
-        'base_rate': str(artist.base_rate),
+        'base_rate': str(artist.get_display_rate()),
         'city': artist.artist.artist_profile.city if hasattr(artist.artist, 'artist_profile') else '',
     } for artist in artists]
     

@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}My Booking Requests - EncoreHub{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-paper-plane text-primary me-2"></i>My Booking Requests
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if user_type == 'artist' %}
+                            Your submitted and received booking requests
+                        {% elif user_type == 'venue' %}
+                            Booking requests for your events
+                        {% elif user_type == 'manager' %}
+                            Booking requests you're managing
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if user_type == 'artist' %}
+                        <a href="{% url 'bookings:event_list' %}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Browse Events
+                        </a>
+                    {% elif user_type == 'venue' %}
+                        <a href="{% url 'bookings:event_list' %}" class="btn btn-primary">
+                            <i class="fas fa-calendar me-2"></i>My Events
+                        </a>
+                    {% elif user_type == 'manager' %}
+                        <a href="{% url 'artists:list' %}" class="btn btn-primary">
+                            <i class="fas fa-users me-2"></i>Browse Artists
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-calendar-check me-2"></i>My Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>All Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if requests %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Event / Title</th>
+                                        <th>Date</th>
+                                        {% if user_type == 'artist' %}
+                                            <th>Venue / Requester</th>
+                                        {% elif user_type == 'venue' %}
+                                            <th>Artist</th>
+                                        {% elif user_type == 'manager' %}
+                                            <th>Artist</th>
+                                            <th>Venue / Requester</th>
+                                        {% endif %}
+                                        <th>Proposed Fee</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in requests %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                {% if req.event %}
+                                                    <strong>{{ req.event.title }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ req.event.get_event_type_display }}</small>
+                                                {% else %}
+                                                    <strong>{{ req.event_name|default:"Direct booking" }}</strong>
+                                                    {% if req.event_type %}
+                                                        <br>
+                                                        <small class="text-muted">{{ req.event_type }}</small>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if req.event %}
+                                                <strong>{{ req.event.event_date|date:"M d, Y" }}</strong>
+                                            {% elif req.event_date %}
+                                                <strong>{{ req.event_date|date:"M d, Y" }}</strong>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                            {% if req.is_expired and req.status == 'pending' %}
+                                                <br>
+                                                <small class="text-danger">Expired</small>
+                                            {% endif %}
+                                        </td>
+                                        {% if user_type == 'artist' %}
+                                            <td>
+                                                {% if req.event %}
+                                                    <strong>{{ req.event.venue.venue_profile.venue_name|default:req.event.venue.get_full_name }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ req.event.city }}, {{ req.event.state }}</small>
+                                                {% elif req.requester %}
+                                                    <strong>{{ req.requester.get_full_name|default:req.requester.email }}</strong>
+                                                    {% if req.requester_type %}
+                                                        <br>
+                                                        <small class="text-muted">{{ req.get_requester_type_display }}</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                        {% elif user_type == 'venue' %}
+                                            <td>
+                                                <div>
+                                                    {% if req.artist.artist_profile %}
+                                                        <strong>{{ req.artist.artist_profile.stage_name|default:req.artist.get_full_name }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ req.artist.artist_profile.genre|default:"—" }}</small>
+                                                    {% else %}
+                                                        <strong>{{ req.artist.get_full_name|default:req.artist.email }}</strong>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        {% elif user_type == 'manager' %}
+                                            <td>
+                                                <div>
+                                                    {% if req.artist.artist_profile %}
+                                                        <strong>{{ req.artist.artist_profile.stage_name|default:req.artist.get_full_name }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ req.artist.artist_profile.genre|default:"—" }}</small>
+                                                    {% else %}
+                                                        <strong>{{ req.artist.get_full_name|default:req.artist.email }}</strong>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if req.event %}
+                                                    <strong>{{ req.event.venue.venue_profile.venue_name|default:req.event.venue.get_full_name }}</strong>
+                                                {% elif req.requester %}
+                                                    <strong>{{ req.requester.get_full_name|default:req.requester.email }}</strong>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                        <td>
+                                            {% if req.proposed_fee %}
+                                                <strong>${{ req.proposed_fee }}</strong>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if req.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif req.status == 'accepted' %}
+                                                <span class="badge bg-success">Accepted</span>
+                                            {% elif req.status == 'declined' %}
+                                                <span class="badge bg-danger">Declined</span>
+                                            {% elif req.status == 'expired' %}
+                                                <span class="badge bg-secondary">Expired</span>
+                                            {% elif req.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ req.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'bookings:request_detail' req.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>View
+                                                </a>
+                                                {% if user_type == 'venue' and req.event and req.status == 'pending' and not req.is_expired %}
+                                                    <a href="{% url 'bookings:respond_to_request' req.pk %}" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-check me-1"></i>Respond
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                            <h5>No Booking Requests</h5>
+                            <p class="text-muted">
+                                {% if user_type == 'artist' %}
+                                    You haven't submitted any booking requests yet. Browse events to apply!
+                                {% elif user_type == 'venue' %}
+                                    You don't have any booking requests yet. Artists will appear here when they apply to your events.
+                                {% elif user_type == 'manager' %}
+                                    You don't have any booking requests to manage yet.
+                                {% endif %}
+                            </p>
+                            <div class="mt-3">
+                                {% if user_type == 'artist' %}
+                                    <a href="{% url 'bookings:event_list' %}" class="btn btn-primary">
+                                        <i class="fas fa-search me-2"></i>Browse Events
+                                    </a>
+                                {% elif user_type == 'venue' %}
+                                    <a href="{% url 'bookings:create_event' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Create Event
+                                    </a>
+                                {% elif user_type == 'manager' %}
+                                    <a href="{% url 'artists:list' %}" class="btn btn-primary">
+                                        <i class="fas fa-users me-2"></i>Browse Artists
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border-radius: 12px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+</style>
+{% endblock %}

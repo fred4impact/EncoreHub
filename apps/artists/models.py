@@ -42,7 +42,36 @@ class ArtistPortfolio(models.Model):
     class Meta:
         verbose_name = _('artist portfolio')
         verbose_name_plural = _('artist portfolios')
-    
+
+    def get_artist_display_name(self):
+        """Return stage name if set, else full name, else username."""
+        user = self.artist
+        try:
+            if user.artist_profile.stage_name:
+                return user.artist_profile.stage_name.strip()
+        except Exception:
+            pass
+        return user.get_full_name() or user.get_username() or 'Artist'
+
+    def get_artist_location(self):
+        """Return city, country from ArtistProfile if available."""
+        try:
+            profile = self.artist.artist_profile
+            parts = [p for p in (profile.city, profile.country) if p and p.strip()]
+            return ', '.join(parts) if parts else ''
+        except Exception:
+            return ''
+
+    def get_display_rate(self):
+        """Return hourly rate from ArtistProfile if set, else portfolio base_rate."""
+        try:
+            rate = self.artist.artist_profile.hourly_rate
+            if rate is not None and rate > 0:
+                return rate
+        except Exception:
+            pass
+        return self.base_rate
+
     def __str__(self):
         return f"Portfolio - {self.artist.get_full_name()}"
 

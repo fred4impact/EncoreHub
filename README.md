@@ -2,6 +2,14 @@
 
 A comprehensive Django-based platform for connecting artists with booking opportunities worldwide.
 
+## 📸 Screenshots
+
+| Home | Dashboard | Artist Discovery | Bookings |
+|------|------------|------------------|----------|
+| ![Home](screenshots/home.png) | ![Dashboard](screenshots/dashboard.png) | ![Artist Discovery](screenshots/artist-discovery.png) | ![Bookings](screenshots/bookings.png) |
+
+*Add your app screenshots to the `screenshots/` folder. Use the filenames above or update the paths in this section.*
+
 ## 🎯 Project Overview
 
 EncoreHub is a full-featured artist booking platform that streamlines the entire process from artist discovery to gig execution. The platform serves as a digital marketplace connecting artists, managers, and clients while providing powerful tools for booking management, payments, and logistics coordination.
